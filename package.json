@@ -35,7 +35,7 @@
     "jest": "26.0.1",
     "jest-circus": "26.0.1",
     "jest-sonar": "0.2.8",
-    "lint-staged": "10.2.7",
+    "lint-staged": "10.2.10",
     "npm-package-json-lint": "5.1.0",
     "prettier": "2.0.5",
     "prettier-package-json": "2.1.3",
