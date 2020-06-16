@@ -1,0 +1,26 @@
+{
+  "enabled": true,
+  "extends": [
+    ":pinSkipCi",
+    "default:pinDigestsDisabled",
+    "config:base",
+    ":automergeMinor"
+  ],
+  "baseBranch": "master",
+  "respectLatest": false,
+  "labels": ["dependencies"],
+  "timezone": "America/Santo_Domingo",
+  "automerge": true,
+  "pin": {
+    "requiredStatusChecks": null
+  },
+  "vulnerabilityAlerts": {
+    "labels": ["dependencies", "security"]
+  },
+  "packageRules": [
+    {
+      "depTypeList": ["dependencies"],
+      "bumpVersion": "patch"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "skipCI": true,
+  "hooks": {
+    "post-checkout": "pip install --user yamllint",
+    "pre-commit": "lint-staged"
+  }
+}

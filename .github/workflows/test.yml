@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: Test
+    env:
+      CI: true
+      TERM: xterm-256color
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        node: [14.x, 12.x, 10.x]
+        exclude:
+          # On Windows, run tests with only the latest environments.
+          - os: windows-latest
+            node: 10.x
+          - os: windows-latest
+            node: 14.x
+          # On macOS, run tests with only the latest environments.
+          - os: macOS-latest
+            node: 10.x
+          - os: macOS-latest
+            node: 14.x
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node }}
+      - run: yarn install --frozen-lockfile --ignore-optional --non-interactive --silent
+      - run: node --expose-gc node_modules/jest/bin/jest --detectLeaks --detectOpenHandles --bail --colors --logHeapUsage --maxWorkers=2 --ci
+
+      - uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage/coverage-final.json
+      # - name: Save ESLint results as JSON for sonar
+      #   run: yarn lint --format json -o reports/eslint-results.json
+      #   if: matrix.os == 'ubuntu-latest' && matrix.node == '12.x'
+      # - name: SonarCloud Scan
+      #   run: |
+      #     curl --create-dirs -sSLo .sonar/sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-$SONAR_SCANNER_VERSION-linux.zip
+      #     unzip -o .sonar/sonar-scanner.zip -d .sonar/
+      #     .sonar/sonar-scanner-$SONAR_SCANNER_VERSION-linux/bin/sonar-scanner \
+      #       -Dsonar.login=${{ secrets.SONAR_LOGIN }}
+      #   if: matrix.os == 'ubuntu-latest' && matrix.node == '12.x'
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      #     SONAR_SCANNER_VERSION: '4.2.0.1873'
+      #     # https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner
+      #     SONAR_SCANNER_OPTS: -Xmx1024m
