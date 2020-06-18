@@ -44,8 +44,21 @@
   "overrides": [
     {
       "files": "**/*.js",
+      "parser": "esprima",
       "rules": {
-        "@typescript-eslint/explicit-function-return-type": "off"
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/await-thenable": "off",
+        "@typescript-eslint/no-floating-promises": "off",
+        "@typescript-eslint/no-implied-eval": "off",
+        "@typescript-eslint/no-misused-promises": "off",
+        "@typescript-eslint/no-unnecessary-type-assertion": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-return": "off",
+        "@typescript-eslint/prefer-regexp-exec": "off",
+        "@typescript-eslint/restrict-plus-operands": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
+        "@typescript-eslint/unbound-method": "off"
       }
     },
     {
@@ -54,8 +67,7 @@
       "extends": ["plugin:jest/recommended"],
       "env": {
         "jest": true,
-        "jest/globals": true,
-        "browser": true
+        "jest/globals": true
       },
       "rules": {
         "@typescript-eslint/no-unused-vars": "warn",
