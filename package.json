@@ -22,7 +22,7 @@
     "build": "nest build",
     "lint": "eslint --ext=ts ./src",
     "prepublishOnly": "yarn test && yarn build",
-    "test": "jest --detectLeaks --detectOpenHandles"
+    "test": "jest"
   },
   "dependencies": {},
   "peerDependencies": {
