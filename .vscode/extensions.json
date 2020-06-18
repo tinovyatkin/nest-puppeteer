@@ -14,7 +14,6 @@
     "github.vscode-pull-request-github",
     "Orta.vscode-jest",
     "redhat.vscode-yaml",
-    "streetsidesoftware.code-spell-checker",
-    "WakaTime.vscode-wakatime"
+    "streetsidesoftware.code-spell-checker"
   ]
 }
