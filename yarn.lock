@@ -637,10 +637,10 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
-"@nestjs/cli@7.3.0":
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/@nestjs/cli/-/cli-7.3.0.tgz#405b09a035336216dbd0e8af98f27c38c7867ac7"
-  integrity sha512-wuxoBYzsJAPivbVAoeVc9GgvsnFwTfjL9RY2yOAvbdKe0UQhaSr2Ca0UqDlLw0gMNKmrbKSKGAKAut0Tvf1WPw==
+"@nestjs/cli@7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@nestjs/cli/-/cli-7.4.0.tgz#15af926464ee7c9dc9d1f2822b1d40d9418e7690"
+  integrity sha512-SMA9k8DWGeMXUhIJAtitG+l2a9IIH0mnsJX5kGhnI890G4yn3d1mFbUCA9rJ9qKc8MpSOEeSDsHzTykr1kUG1w==
   dependencies:
     "@angular-devkit/core" "9.1.9"
     "@angular-devkit/schematics" "9.1.9"
