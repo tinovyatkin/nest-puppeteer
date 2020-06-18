@@ -80,7 +80,7 @@
     "puppeteer"
   ],
   "engines": {
-    "node": ">=12.3",
+    "node": ">=10.21",
     "yarn": ">=1.19"
   }
 }
