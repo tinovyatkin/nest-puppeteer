@@ -1,4 +1,4 @@
-import { BrowserContext } from 'puppeteer';
+import type { BrowserContext } from 'puppeteer';
 import { getContextToken, getPageToken } from './puppeteer.util';
 
 export function createPuppeteerProviders(

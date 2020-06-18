@@ -1,8 +1,8 @@
 import { Module, DynamicModule } from '@nestjs/common';
 import { createPuppeteerProviders } from './puppeteer.providers';
 import { PuppeteerCoreModule } from './puppeteer-core.module';
-import { LaunchOptions } from 'puppeteer';
-import { PuppeteerModuleAsyncOptions } from './interfaces/puppeteer-options.interface';
+import type { LaunchOptions } from 'puppeteer';
+import type { PuppeteerModuleAsyncOptions } from './interfaces/puppeteer-options.interface';
 
 /**
  * Module for the Puppeteer

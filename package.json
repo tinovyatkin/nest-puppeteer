@@ -21,9 +21,10 @@
     "prebuild": "rimraf dist",
     "build": "nest build",
     "lint": "eslint --ext=ts ./src",
-    "prepublishOnly": "jest && tsc",
-    "test": "jest"
+    "prepublishOnly": "yarn test && yarn build",
+    "test": "jest --detectLeaks --detectOpenHandles"
   },
+  "dependencies": {},
   "peerDependencies": {
     "@nestjs/common": "^6.0.0 || ^7.0.0",
     "@nestjs/core": "^6.0.0 || ^7.0.0",

@@ -4,17 +4,18 @@ import {
   Global,
   DynamicModule,
   Provider,
+  OnApplicationShutdown,
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { LaunchOptions } from 'puppeteer';
-import puppeteer from 'puppeteer';
+import type { LaunchOptions, Browser, BrowserContext } from 'puppeteer';
+import { launch } from 'puppeteer';
 import {
   PUPPETEER_INSTANCE_NAME,
   DEFAULT_PUPPETEER_INSTANCE_NAME,
   DEFAULT_CHROME_LAUNCH_OPTIONS,
   PUPPETEER_MODULE_OPTIONS,
 } from './puppeteer.constants';
-import {
+import type {
   PuppeteerModuleAsyncOptions,
   PuppeteerOptionsFactory,
   PuppeteerModuleOptions,
@@ -27,11 +28,14 @@ import {
 
 @Global()
 @Module({})
-export class PuppeteerCoreModule {
+export class PuppeteerCoreModule implements OnApplicationShutdown {
   constructor(
     @Inject(PUPPETEER_INSTANCE_NAME) private readonly instanceName: string,
     private readonly moduleRef: ModuleRef,
   ) {}
+  onApplicationShutdown() {
+    return this.onModuleDestroy();
+  }
 
   static forRoot(
     launchOptions: LaunchOptions = DEFAULT_CHROME_LAUNCH_OPTIONS,
@@ -45,23 +49,21 @@ export class PuppeteerCoreModule {
     const browserProvider = {
       provide: getBrowserToken(instanceName),
       useFactory: async () => {
-        return await puppeteer.launch(launchOptions);
+        return await launch(launchOptions);
       },
     };
 
     const contextProvider = {
       provide: getContextToken(instanceName),
-      useFactory: async (browser: puppeteer.Browser, incognito = true) => {
-        if (incognito) return await browser.createIncognitoBrowserContext();
-        return browser.defaultBrowserContext();
+      useFactory: async (browser: Browser) => {
+        return await browser.createIncognitoBrowserContext();
       },
       inject: [getBrowserToken(instanceName)],
     };
 
     const pageProvider = {
       provide: getPageToken(instanceName),
-      useFactory: async (context: puppeteer.BrowserContext) =>
-        await context.newPage(),
+      useFactory: async (context: BrowserContext) => await context.newPage(),
       inject: [getContextToken(instanceName)],
     };
 
@@ -89,7 +91,7 @@ export class PuppeteerCoreModule {
     const browserProvider = {
       provide: getBrowserToken(puppeteerInstanceName),
       useFactory: async (puppeteerModuleOptions: PuppeteerModuleOptions) => {
-        return await puppeteer.launch(
+        return await launch(
           puppeteerModuleOptions.launchOptions ?? DEFAULT_CHROME_LAUNCH_OPTIONS,
         );
       },
@@ -98,9 +100,8 @@ export class PuppeteerCoreModule {
 
     const contextProvider = {
       provide: getContextToken(puppeteerInstanceName),
-      useFactory: async (browser: puppeteer.Browser, incognito = true) => {
-        if (incognito) return await browser.createIncognitoBrowserContext();
-        return browser.defaultBrowserContext();
+      useFactory: async (browser: Browser) => {
+        return await browser.createIncognitoBrowserContext();
       },
       inject: [
         PUPPETEER_MODULE_OPTIONS,
@@ -110,8 +111,7 @@ export class PuppeteerCoreModule {
 
     const pageProvider = {
       provide: getPageToken(puppeteerInstanceName),
-      useFactory: async (context: puppeteer.BrowserContext) =>
-        await context.newPage(),
+      useFactory: async (context: BrowserContext) => await context.newPage(),
       inject: [
         PUPPETEER_MODULE_OPTIONS,
         getContextToken(puppeteerInstanceName),
@@ -135,7 +135,7 @@ export class PuppeteerCoreModule {
   }
 
   async onModuleDestroy() {
-    const browser: puppeteer.Browser = this.moduleRef.get(
+    const browser: Browser = this.moduleRef.get(
       getBrowserToken(this.instanceName),
     );
 

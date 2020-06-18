@@ -35,4 +35,11 @@ describe('AppController (e2e)', () => {
       }
     `);
   }, 30000);
+
+  it('/crawler/context (GET)', async () => {
+    const { body } = await request(app.getHttpServer())
+      .get('/crawler/context')
+      .expect(200);
+    expect(body).toHaveProperty('incognito', true);
+  }, 30000);
 });
