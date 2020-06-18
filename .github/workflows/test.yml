@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 1
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2-beta
         with:
           node-version: ${{ matrix.node }}
       - run: yarn install --frozen-lockfile --ignore-optional --non-interactive --silent
