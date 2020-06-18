@@ -1,4 +1,4 @@
-# nest-puppeteer
+# nest-puppeteer [![codecov](https://codecov.io/gh/tinovyatkin/nest-puppeteer/branch/master/graph/badge.svg)](https://codecov.io/gh/tinovyatkin/nest-puppeteer)
 
 ## Description
 
