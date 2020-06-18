@@ -1,29 +1,31 @@
-import { DEFAULT_MONGO_CONNECTION_NAME } from './mongo.constants';
+import { DEFAULT_PUPPETEER_INSTANCE_NAME } from './puppeteer.constants';
 
 /**
- * Get a token for the MongoClient object for the given connection name
- * @param connectionName The unique name for the connection
+ * Get a token for the Puppeteer instance for the given Browser name
+ * @param instanceName The unique name for the Puppeteer instance
  */
-export function getClientToken(
-  connectionName: string = DEFAULT_MONGO_CONNECTION_NAME,
-) {
-  return `${connectionName}Client`;
+export function getBrowserToken(
+  instanceName: string = DEFAULT_PUPPETEER_INSTANCE_NAME,
+): string {
+  return `${instanceName}Browser`;
 }
 
 /**
- * Get a token for the Mongo Db object for the given connection name
- * @param connectionName The unique name for the connection
+ * Get a token for the Puppeteer instance for the given BrowserContext name
+ * @param instanceName The unique name for the Puppeteer instance
  */
-export function getDbToken(
-  connectionName: string = DEFAULT_MONGO_CONNECTION_NAME,
-) {
-  return `${connectionName}Db`;
+export function getContextToken(
+  instanceName: string = DEFAULT_PUPPETEER_INSTANCE_NAME,
+): string {
+  return `${instanceName}Context`;
 }
 
 /**
- * Get a token for the Mongo Db object for the given connection name
- * @param collectionName The unique name for the collection
+ * Get a token for the Puppeteer instance for the given Page name
+ * @param instanceName The unique name for the Puppeteer instance
  */
-export function getCollectionToken(collectionName: string) {
-  return `${collectionName}Collection`;
+export function getPageToken(
+  instanceName: string = DEFAULT_PUPPETEER_INSTANCE_NAME,
+): string {
+  return `${instanceName}Page`;
 }

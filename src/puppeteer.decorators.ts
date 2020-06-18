@@ -1,23 +1,27 @@
 import { Inject } from '@nestjs/common';
-import { getClientToken, getDbToken, getCollectionToken } from './mongo.util';
+import {
+  getBrowserToken,
+  getContextToken,
+  getPageToken,
+} from './puppeteer.util';
 
 /**
- * Inject the MongoClient object associated with a connection
- * @param connectionName The unique name associated with the connection
+ * Inject the Browser object associated with a connection
+ * @param instanceName The unique name associated with the browser
  */
-export const InjectClient = (connectionName?: string) =>
-  Inject(getClientToken(connectionName));
+export const InjectBrowser = (instanceName?: string) =>
+  Inject(getBrowserToken(instanceName));
 
 /**
- * Inject the Mongo Db object associated with a connection
- * @param connectionName The unique name associated with the connection
+ * Inject the Puppeteer BrowserContext object associated with a browser
+ * @param instanceName The unique name associated with the browser
  */
-export const InjectDb = (connectionName?: string) =>
-  Inject(getDbToken(connectionName));
+export const InjectContext = (instanceName?: string) =>
+  Inject(getContextToken(instanceName));
 
 /**
- * Inject the Mongo Collection object associated with a Db
- * @param collectionName The unique name associated with the collection
+ * Inject the Puppeteer Page object associated with BrowserContext
+ * @param instanceName The unique name associated with the instance
  */
-export const InjectCollection = (collectionName: string) =>
-  Inject(getCollectionToken(collectionName));
+export const InjectPage = (instanceName?: string) =>
+  Inject(getPageToken(instanceName));

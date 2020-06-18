@@ -1,13 +1,13 @@
-import { Db } from 'mongodb';
-import { getCollectionToken, getDbToken } from './mongo.util';
+import { BrowserContext } from 'puppeteer';
+import { getContextToken, getPageToken } from './puppeteer.util';
 
-export function createMongoProviders(
-  connectionName?: string,
-  collections: string[] = [],
+export function createPuppeteerProviders(
+  instanceName?: string,
+  pages: string[] = [],
 ) {
-  return collections.map(collectionName => ({
-    provide: getCollectionToken(collectionName),
-    useFactory: (db: Db) => db.collection(collectionName),
-    inject: [getDbToken(connectionName)],
+  return pages.map(page => ({
+    provide: getPageToken(page),
+    useFactory: (context: BrowserContext) => context.newPage(),
+    inject: [getContextToken(instanceName)],
   }));
 }

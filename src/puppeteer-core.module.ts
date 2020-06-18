@@ -4,119 +4,146 @@ import {
   Global,
   DynamicModule,
   Provider,
-  Type,
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
-import { MongoClient, MongoClientOptions } from 'mongodb';
+import { LaunchOptions } from 'puppeteer';
+import puppeteer from 'puppeteer';
 import {
-  MONGO_CONNECTION_NAME,
-  DEFAULT_MONGO_CONNECTION_NAME,
-  DEFAULT_MONGO_CLIENT_OPTIONS,
-  MONGO_MODULE_OPTIONS,
-} from './mongo.constants';
+  PUPPETEER_INSTANCE_NAME,
+  DEFAULT_PUPPETEER_INSTANCE_NAME,
+  DEFAULT_CHROME_LAUNCH_OPTIONS,
+  PUPPETEER_MODULE_OPTIONS,
+} from './puppeteer.constants';
 import {
-  MongoModuleAsyncOptions,
-  MongoOptionsFactory,
-  MongoModuleOptions,
-} from './interfaces/mongo-options.interface';
-import { getClientToken, getDbToken } from './mongo.util';
+  PuppeteerModuleAsyncOptions,
+  PuppeteerOptionsFactory,
+  PuppeteerModuleOptions,
+} from './interfaces/puppeteer-options.interface';
+import {
+  getBrowserToken,
+  getContextToken,
+  getPageToken,
+} from './puppeteer.util';
 
 @Global()
 @Module({})
-export class MongoCoreModule {
+export class PuppeteerCoreModule {
   constructor(
-    @Inject(MONGO_CONNECTION_NAME) private readonly connectionName: string,
+    @Inject(PUPPETEER_INSTANCE_NAME) private readonly instanceName: string,
     private readonly moduleRef: ModuleRef,
   ) {}
 
   static forRoot(
-    uri: string,
-    dbName: string,
-    clientOptions: MongoClientOptions = DEFAULT_MONGO_CLIENT_OPTIONS,
-    connectionName: string = DEFAULT_MONGO_CONNECTION_NAME,
+    launchOptions: LaunchOptions = DEFAULT_CHROME_LAUNCH_OPTIONS,
+    instanceName: string = DEFAULT_PUPPETEER_INSTANCE_NAME,
   ): DynamicModule {
-    const connectionNameProvider = {
-      provide: MONGO_CONNECTION_NAME,
-      useValue: connectionName,
+    const instanceNameProvider = {
+      provide: PUPPETEER_INSTANCE_NAME,
+      useValue: instanceName,
     };
 
-    const clientProvider = {
-      provide: getClientToken(connectionName),
+    const browserProvider = {
+      provide: getBrowserToken(instanceName),
       useFactory: async () => {
-        const client = new MongoClient(uri, clientOptions);
-        return await client.connect();
+        return await puppeteer.launch(launchOptions);
       },
     };
 
-    const dbProvider = {
-      provide: getDbToken(connectionName),
-      useFactory: (client: MongoClient) => client.db(dbName),
-      inject: [getClientToken(connectionName)],
+    const contextProvider = {
+      provide: getContextToken(instanceName),
+      useFactory: async (browser: puppeteer.Browser, incognito = true) => {
+        if (incognito) return await browser.createIncognitoBrowserContext();
+        return browser.defaultBrowserContext();
+      },
+      inject: [getBrowserToken(instanceName)],
+    };
+
+    const pageProvider = {
+      provide: getPageToken(instanceName),
+      useFactory: async (context: puppeteer.BrowserContext) =>
+        await context.newPage(),
+      inject: [getContextToken(instanceName)],
     };
 
     return {
-      module: MongoCoreModule,
-      providers: [connectionNameProvider, clientProvider, dbProvider],
-      exports: [clientProvider, dbProvider],
+      module: PuppeteerCoreModule,
+      providers: [
+        instanceNameProvider,
+        browserProvider,
+        contextProvider,
+        pageProvider,
+      ],
+      exports: [browserProvider, contextProvider, pageProvider],
     };
   }
 
-  static forRootAsync(options: MongoModuleAsyncOptions): DynamicModule {
-    const mongoConnectionName =
-      options.connectionName ?? DEFAULT_MONGO_CONNECTION_NAME;
+  static forRootAsync(options: PuppeteerModuleAsyncOptions): DynamicModule {
+    const puppeteerInstanceName =
+      options.instanceName ?? DEFAULT_PUPPETEER_INSTANCE_NAME;
 
-    const connectionNameProvider = {
-      provide: MONGO_CONNECTION_NAME,
-      useValue: mongoConnectionName,
+    const instanceNameProvider = {
+      provide: PUPPETEER_INSTANCE_NAME,
+      useValue: puppeteerInstanceName,
     };
 
-    const clientProvider = {
-      provide: getClientToken(mongoConnectionName),
-      useFactory: async (mongoModuleOptions: MongoModuleOptions) => {
-        const { uri, clientOptions } = mongoModuleOptions;
-        const client = new MongoClient(
-          uri,
-          clientOptions ?? DEFAULT_MONGO_CLIENT_OPTIONS,
+    const browserProvider = {
+      provide: getBrowserToken(puppeteerInstanceName),
+      useFactory: async (puppeteerModuleOptions: PuppeteerModuleOptions) => {
+        return await puppeteer.launch(
+          puppeteerModuleOptions.launchOptions ?? DEFAULT_CHROME_LAUNCH_OPTIONS,
         );
-        return await client.connect();
       },
-      inject: [MONGO_MODULE_OPTIONS],
+      inject: [PUPPETEER_MODULE_OPTIONS],
     };
 
-    const dbProvider = {
-      provide: getDbToken(mongoConnectionName),
-      useFactory: (
-        mongoModuleOptions: MongoModuleOptions,
-        client: MongoClient,
-      ) => client.db(mongoModuleOptions.dbName),
-      inject: [MONGO_MODULE_OPTIONS, getClientToken(mongoConnectionName)],
+    const contextProvider = {
+      provide: getContextToken(puppeteerInstanceName),
+      useFactory: async (browser: puppeteer.Browser, incognito = true) => {
+        if (incognito) return await browser.createIncognitoBrowserContext();
+        return browser.defaultBrowserContext();
+      },
+      inject: [
+        PUPPETEER_MODULE_OPTIONS,
+        getBrowserToken(puppeteerInstanceName),
+      ],
+    };
+
+    const pageProvider = {
+      provide: getPageToken(puppeteerInstanceName),
+      useFactory: async (context: puppeteer.BrowserContext) =>
+        await context.newPage(),
+      inject: [
+        PUPPETEER_MODULE_OPTIONS,
+        getContextToken(puppeteerInstanceName),
+      ],
     };
 
     const asyncProviders = this.createAsyncProviders(options);
 
     return {
-      module: MongoCoreModule,
+      module: PuppeteerCoreModule,
       imports: options.imports,
       providers: [
         ...asyncProviders,
-        clientProvider,
-        dbProvider,
-        connectionNameProvider,
+        browserProvider,
+        contextProvider,
+        pageProvider,
+        instanceNameProvider,
       ],
-      exports: [clientProvider, dbProvider],
+      exports: [browserProvider, contextProvider, pageProvider],
     };
   }
 
   async onModuleDestroy() {
-    const client: MongoClient = this.moduleRef.get<any>(
-      getClientToken(this.connectionName),
+    const browser: puppeteer.Browser = this.moduleRef.get(
+      getBrowserToken(this.instanceName),
     );
 
-    if (client && client.isConnected()) await client.close();
+    if (browser && browser.isConnected()) await browser.close();
   }
 
   private static createAsyncProviders(
-    options: MongoModuleAsyncOptions,
+    options: PuppeteerModuleAsyncOptions,
   ): Provider[] {
     if (options.useExisting || options.useFactory) {
       return [this.createAsyncOptionsProvider(options)];
@@ -134,30 +161,30 @@ export class MongoCoreModule {
   }
 
   private static createAsyncOptionsProvider(
-    options: MongoModuleAsyncOptions,
+    options: PuppeteerModuleAsyncOptions,
   ): Provider {
     if (options.useFactory) {
       return {
-        provide: MONGO_MODULE_OPTIONS,
+        provide: PUPPETEER_MODULE_OPTIONS,
         useFactory: options.useFactory,
         inject: options.inject ?? [],
       };
     } else if (options.useExisting) {
       return {
-        provide: MONGO_MODULE_OPTIONS,
-        useFactory: async (optionsFactory: MongoOptionsFactory) =>
-          await optionsFactory.createMongoOptions(),
+        provide: PUPPETEER_MODULE_OPTIONS,
+        useFactory: async (optionsFactory: PuppeteerOptionsFactory) =>
+          await optionsFactory.createPuppeteerOptions(),
         inject: [options.useExisting],
       };
     } else if (options.useClass) {
       return {
-        provide: MONGO_MODULE_OPTIONS,
-        useFactory: async (optionsFactory: MongoOptionsFactory) =>
-          await optionsFactory.createMongoOptions(),
+        provide: PUPPETEER_MODULE_OPTIONS,
+        useFactory: async (optionsFactory: PuppeteerOptionsFactory) =>
+          await optionsFactory.createPuppeteerOptions(),
         inject: [options.useClass],
       };
     } else {
-      throw new Error('Invalid MongoModule options');
+      throw new Error('Invalid PuppeteerModule options');
     }
   }
 }

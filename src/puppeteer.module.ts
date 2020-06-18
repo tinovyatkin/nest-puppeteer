@@ -1,59 +1,55 @@
 import { Module, DynamicModule } from '@nestjs/common';
-import { createMongoProviders } from './mongo.providers';
-import { MongoCoreModule } from './mongo-core.module';
-import { MongoClientOptions } from 'mongodb';
-import { MongoModuleAsyncOptions } from './interfaces/mongo-options.interface';
+import { createPuppeteerProviders } from './puppeteer.providers';
+import { PuppeteerCoreModule } from './puppeteer-core.module';
+import { LaunchOptions } from 'puppeteer';
+import { PuppeteerModuleAsyncOptions } from './interfaces/puppeteer-options.interface';
 
 /**
- * Module for the MongoDB driver
+ * Module for the Puppeteer
  */
 @Module({})
-export class MongoModule {
+export class PuppeteerModule {
   /**
-   * Inject the MongoDB driver synchronously.
-   * @param uri The database URI
-   * @param dbName The database name
-   * @param options Options for the MongoClient that will be created
-   * @param connectionName A unique name for the connection.  If not specified, a default name
+   * Inject the Puppeteer synchronously.
+   * @param options Options for the Browser to be launched
+   * @param instanceName A unique name for the connection.  If not specified, a default name
    * will be used.
    */
   static forRoot(
-    uri: string,
-    dbName: string,
-    options?: MongoClientOptions,
-    connectionName?: string,
+    options?: LaunchOptions,
+    instanceName?: string,
   ): DynamicModule {
     return {
-      module: MongoModule,
-      imports: [MongoCoreModule.forRoot(uri, dbName, options, connectionName)],
+      module: PuppeteerModule,
+      imports: [PuppeteerCoreModule.forRoot(options, instanceName)],
     };
   }
 
   /**
-   * Inject the MongoDB driver asynchronously, allowing any dependencies such as a configuration
+   * Inject the Puppeteer asynchronously, allowing any dependencies such as a configuration
    * service to be injected first.
-   * @param options Options for asynchrous injection
+   * @param options Options for asynchronous injection
    */
-  static forRootAsync(options: MongoModuleAsyncOptions): DynamicModule {
+  static forRootAsync(options: PuppeteerModuleAsyncOptions): DynamicModule {
     return {
-      module: MongoModule,
-      imports: [MongoCoreModule.forRootAsync(options)],
+      module: PuppeteerModule,
+      imports: [PuppeteerCoreModule.forRootAsync(options)],
     };
   }
 
   /**
-   * Inject collections.
-   * @param collections An array of the names of the collections to be injected.
-   * @param connectionName A unique name for the connection. If not specified, a default name
+   * Inject Pages.
+   * @param pages An array of the names of the pages to be injected.
+   * @param instanceName A unique name for the connection. If not specified, a default name
    * will be used.
    */
   static forFeature(
-    collections: string[] = [],
-    connectionName?: string,
+    pages: string[] = [],
+    instanceName?: string,
   ): DynamicModule {
-    const providers = createMongoProviders(connectionName, collections);
+    const providers = createPuppeteerProviders(instanceName, pages);
     return {
-      module: MongoModule,
+      module: PuppeteerModule,
       providers: providers,
       exports: providers,
     };

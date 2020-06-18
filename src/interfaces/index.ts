@@ -1,1 +1,1 @@
-export * from './mongo-options.interface'
+export * from './puppeteer-options.interface';
