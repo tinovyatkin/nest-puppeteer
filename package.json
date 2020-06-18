@@ -11,26 +11,23 @@
   "bugs": {
     "url": "https://github.com/tinovyatkin/nest-puppeteer/issues"
   },
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/index.js",
   "files": [
     "dist/**/*.d.ts",
-    "dist/**/*.js"
+    "dist/*.js"
   ],
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
     "lint": "eslint --ext=ts ./src",
-    "prepublishOnly": "yarn test && yarn build",
+    "prepublishOnly": "yarn build",
     "test": "jest"
   },
-  "dependencies": {},
   "peerDependencies": {
     "@nestjs/common": "^6.0.0 || ^7.0.0",
     "@nestjs/core": "^6.0.0 || ^7.0.0",
-    "puppeteer": "^3 || ^4",
-    "reflect-metadata": "^0.1.12",
-    "rxjs": "^6.0.0"
+    "puppeteer": "^3 || ^4"
   },
   "devDependencies": {
     "@nestjs/cli": "7.2.0",
