@@ -25,6 +25,8 @@
     "SharedArrayBuffer": "readonly"
   },
   "rules": {
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/require-await": "off",
     "node/no-unsupported-features/es-syntax": [
       "error",
