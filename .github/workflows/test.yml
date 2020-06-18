@@ -37,7 +37,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: yarn install --frozen-lockfile --ignore-optional --non-interactive --silent
-      - run: node --expose-gc node_modules/jest/bin/jest --detectLeaks --detectOpenHandles --bail --colors --logHeapUsage --maxWorkers=2 --ci
+      - run: node --expose-gc node_modules/jest/bin/jest --bail --colors --logHeapUsage --maxWorkers=2 --ci
 
       - uses: codecov/codecov-action@v1
         with:

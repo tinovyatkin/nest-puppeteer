@@ -1,3 +1,7 @@
+ignore:
+  - '**/__tests__/**' # ignore folders and all its contents
+  - '**/*.spec.ts'
+
 coverage:
   parsers:
     javascript:

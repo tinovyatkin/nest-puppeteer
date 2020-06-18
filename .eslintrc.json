@@ -18,7 +18,8 @@
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "prettier",
     "prettier/@typescript-eslint",
-    "plugin:node/recommended"
+    "plugin:node/recommended",
+    "plugin:import/typescript"
   ],
   "globals": {
     "Atomics": "readonly",
@@ -70,8 +71,12 @@
         "jest/globals": true
       },
       "rules": {
+        "jest/expect-expect": "off", // we use supertest assertions
         "@typescript-eslint/no-unused-vars": "warn",
         "@typescript-eslint/ban-ts-ignore": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
         "import/order": "off", // may interfere with mocking,
         "max-nested-callbacks": "off",
         "max-lines": "off"
