@@ -8,7 +8,7 @@ module.exports = {
   ],
   '.env': ['git rm'],
   '*.{yaml,yml}': ['yamllint', 'prettier --write'],
-  '*.{md,json}': ['prettier --write'],
+  '*.{md,json,js}': ['prettier --write'],
   '**/package.json': filenames => [
     'yarn check --integrity',
     ...filenames.map(file => `npmPkgJsonLint ${file}`),
