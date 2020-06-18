@@ -5,11 +5,13 @@ import { Browser } from 'puppeteer';
 
 import { PuppeteerModule, InjectBrowser } from '../../src/';
 import { CrawlerModule } from './crawler.module';
+import { CrawlerController } from './crawler.controller';
+import { CrawlerService } from './crawler.service';
 
 @Module({
   imports: [PuppeteerModule.forRoot(), CrawlerModule],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, CrawlerController],
+  providers: [AppService, CrawlerService],
 })
 export class AppModule {
   constructor(@InjectBrowser() private readonly browser: Browser) {}

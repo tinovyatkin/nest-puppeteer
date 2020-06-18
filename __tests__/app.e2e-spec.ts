@@ -23,4 +23,16 @@ describe('AppController (e2e)', () => {
       .expect(200)
       .expect('Hello World!');
   });
+
+  it('/crawler/ (POST)', async () => {
+    const { body } = await request(app.getHttpServer())
+      .post('/crawler')
+      .send({ url: `http://localhost:${app.getHttpServer().address().port}/` })
+      .expect(201);
+    expect(body).toMatchInlineSnapshot(`
+      Object {
+        "content": "<html><head></head><body>Hello World!</body></html>",
+      }
+    `);
+  }, 30000);
 });
