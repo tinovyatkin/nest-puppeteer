@@ -97,7 +97,7 @@ Inject `Page` object:
 
 ```typescript
 import { Injectable } from '@nestjs/common';
-import { InjectPage } from '../../src/';
+import { InjectPage } from 'nest-puppeteer';
 import type { Page } from 'puppeteer';
 
 @Injectable()
