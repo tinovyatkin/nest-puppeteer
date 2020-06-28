@@ -9,7 +9,7 @@ import { CrawlerController } from './crawler.controller';
 import { CrawlerService } from './crawler.service';
 
 @Module({
-  imports: [PuppeteerModule.forRoot(), CrawlerModule],
+  imports: [PuppeteerModule.forRoot({ isGlobal: true }), CrawlerModule],
   controllers: [AppController, CrawlerController],
   providers: [AppService, CrawlerService],
 })

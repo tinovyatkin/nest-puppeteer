@@ -6,6 +6,7 @@ import type { LaunchOptions } from 'puppeteer';
  */
 export interface PuppeteerModuleOptions {
   instanceName?: string;
+
   launchOptions?: LaunchOptions;
 }
 
@@ -23,6 +24,12 @@ export interface PuppeteerModuleAsyncOptions
   extends Pick<ModuleMetadata, 'imports'> {
   /** A unique name for the instance.  If not specified, a default one will be used. */
   instanceName?: string;
+
+  /**
+   * If "true", registers `PuppeteerModule` as a global module.
+   * See: https://docs.nestjs.com/modules#global-modules
+   */
+  isGlobal?: boolean;
 
   /** Reuse an injectable factory class created in another module. */
   useExisting?: Type<PuppeteerOptionsFactory>;
