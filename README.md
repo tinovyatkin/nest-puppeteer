@@ -28,10 +28,8 @@ import { PuppeteerModule } from 'nest-puppeteer';
 @Module({
   imports: [
     PuppeteerModule.forRoot(
-      {
-        pipe: true /* any Puppeteer launch options here or leave empty for good defaults */,
-      },
-      'OptionalInstanceName',
+      { pipe: true }, // optional, any Puppeteer launch options here or leave empty for good defaults */,
+      'BrowserInstanceName', // optional, can be useful for using Chrome and Firefox in the same project
     ),
   ],
 })
@@ -193,3 +191,21 @@ export class CatsModule {}
 ```
 
 In this example, we're assuming that `ConfigService` implements the `PuppeteerOptionsFactory` interface and can be found in the ConfigModule.
+
+#### Use module globally
+
+When you want to use `PuppeteerModule` in other modules, you'll need to import it (as is standard with any Nest module). Alternatively, declare it as a [global module](https://docs.nestjs.com/modules#global-modules) by setting the options object's `isGlobal` property to `true`, as shown below. In that case, you will not need to import `PuppeteerModule` in other modules once it's been loaded in the root module (e.g., `AppModule`).
+
+```typescript
+PuppeteerModule.forRoot({
+  isGlobal: true,
+});
+```
+
+## Stay in touch
+
+- Author - [Konstantin Vyatkin](tino@vtkn.io)
+
+## License
+
+`nest-puppeteer` is [MIT licensed](LICENSE).
