@@ -49,7 +49,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - run: yarn install --frozen-lockfile --ignore-optional --non-interactive --silent
+      - run: yarn install --frozen-lockfile --ignore-optional --non-interactive --silent --network-timeout 600000
       - run: node --expose-gc node_modules/jest/bin/jest --bail --colors --logHeapUsage --maxWorkers=2 --ci
 
       - uses: codecov/codecov-action@v1
