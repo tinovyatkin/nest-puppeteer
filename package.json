@@ -60,7 +60,7 @@
     "puppeteer": "4.0.1",
     "reflect-metadata": "0.1.13",
     "rimraf": "3.0.2",
-    "rxjs": "6.5.5",
+    "rxjs": "6.6.0",
     "supertest": "4.0.2",
     "ts-jest": "26.1.1",
     "ts-loader": "7.0.5",
