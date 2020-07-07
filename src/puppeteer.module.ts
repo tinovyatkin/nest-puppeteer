@@ -54,7 +54,7 @@ export class PuppeteerModule {
     const providers = createPuppeteerProviders(instanceName, pages);
     return {
       module: PuppeteerModule,
-      providers: providers,
+      providers,
       exports: providers,
     };
   }

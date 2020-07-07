@@ -50,22 +50,24 @@ export class PuppeteerCoreModule
 
     const browserProvider = {
       provide: getBrowserToken(instanceName),
-      useFactory: async () => {
+      async useFactory() {
         return await launch(launchOptions);
       },
     };
 
     const contextProvider = {
       provide: getContextToken(instanceName),
-      useFactory: async (browser: Browser) => {
-        return await browser.createIncognitoBrowserContext();
+      async useFactory(browser: Browser) {
+        return browser.createIncognitoBrowserContext();
       },
       inject: [getBrowserToken(instanceName)],
     };
 
     const pageProvider = {
       provide: getPageToken(instanceName),
-      useFactory: async (context: BrowserContext) => await context.newPage(),
+      async useFactory(context: BrowserContext) {
+        return await context.newPage();
+      },
       inject: [getContextToken(instanceName)],
     };
 
@@ -92,7 +94,7 @@ export class PuppeteerCoreModule
 
     const browserProvider = {
       provide: getBrowserToken(puppeteerInstanceName),
-      useFactory: async (puppeteerModuleOptions: PuppeteerModuleOptions) => {
+      async useFactory(puppeteerModuleOptions: PuppeteerModuleOptions) {
         return await launch(
           puppeteerModuleOptions.launchOptions ?? DEFAULT_CHROME_LAUNCH_OPTIONS,
         );
@@ -102,7 +104,7 @@ export class PuppeteerCoreModule
 
     const contextProvider = {
       provide: getContextToken(puppeteerInstanceName),
-      useFactory: async (browser: Browser) => {
+      async useFactory(browser: Browser) {
         return await browser.createIncognitoBrowserContext();
       },
       inject: [
@@ -113,7 +115,9 @@ export class PuppeteerCoreModule
 
     const pageProvider = {
       provide: getPageToken(puppeteerInstanceName),
-      useFactory: async (context: BrowserContext) => await context.newPage(),
+      async useFactory(context: BrowserContext) {
+        return await context.newPage();
+      },
       inject: [
         PUPPETEER_MODULE_OPTIONS,
         getContextToken(puppeteerInstanceName),
@@ -174,15 +178,17 @@ export class PuppeteerCoreModule
     } else if (options.useExisting) {
       return {
         provide: PUPPETEER_MODULE_OPTIONS,
-        useFactory: async (optionsFactory: PuppeteerOptionsFactory) =>
-          await optionsFactory.createPuppeteerOptions(),
+        async useFactory(optionsFactory: PuppeteerOptionsFactory) {
+          return optionsFactory.createPuppeteerOptions();
+        },
         inject: [options.useExisting],
       };
     } else if (options.useClass) {
       return {
         provide: PUPPETEER_MODULE_OPTIONS,
-        useFactory: async (optionsFactory: PuppeteerOptionsFactory) =>
-          await optionsFactory.createPuppeteerOptions(),
+        async useFactory(optionsFactory: PuppeteerOptionsFactory) {
+          return optionsFactory.createPuppeteerOptions();
+        },
         inject: [options.useClass],
       };
     } else {
