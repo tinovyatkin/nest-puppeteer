@@ -5,6 +5,7 @@ import {
   DynamicModule,
   Provider,
   OnApplicationShutdown,
+  OnModuleDestroy,
 } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import type { LaunchOptions, Browser, BrowserContext } from 'puppeteer';
@@ -28,7 +29,8 @@ import {
 
 @Global()
 @Module({})
-export class PuppeteerCoreModule implements OnApplicationShutdown {
+export class PuppeteerCoreModule
+  implements OnApplicationShutdown, OnModuleDestroy {
   constructor(
     @Inject(PUPPETEER_INSTANCE_NAME) private readonly instanceName: string,
     private readonly moduleRef: ModuleRef,
@@ -139,7 +141,7 @@ export class PuppeteerCoreModule implements OnApplicationShutdown {
       getBrowserToken(this.instanceName),
     );
 
-    if (browser && browser.isConnected()) await browser.close();
+    if (browser?.isConnected()) await browser.close();
   }
 
   private static createAsyncProviders(

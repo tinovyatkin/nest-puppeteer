@@ -25,9 +25,9 @@
     "test": "jest"
   },
   "peerDependencies": {
-    "@nestjs/common": "^6.0.0 || ^7.0.0",
-    "@nestjs/core": "^6.0.0 || ^7.0.0",
-    "puppeteer": "^3 || ^4 || ^5.0.0"
+    "@nestjs/common": ">=6",
+    "@nestjs/core": ">=6",
+    "puppeteer": ">=3"
   },
   "devDependencies": {
     "@nestjs/cli": "7.4.1",
