@@ -30,7 +30,7 @@
     "puppeteer": ">=3"
   },
   "devDependencies": {
-    "@nestjs/cli": "7.5.2",
+    "@nestjs/cli": "7.5.3",
     "@nestjs/common": "7.5.2",
     "@nestjs/core": "7.5.2",
     "@nestjs/platform-express": "7.5.2",
