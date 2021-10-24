@@ -8,7 +8,6 @@ module.exports = {
   collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
   moduleFileExtensions: ['ts', 'js'],
   coverageProvider: 'v8',
-  testRunner: 'jest-circus/runner',
   rootDir: '.',
   testRegex: '.e2e-spec.ts$',
   watchPathIgnorePatterns: [
