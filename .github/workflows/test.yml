@@ -52,7 +52,7 @@ jobs:
       - run: yarn install --frozen-lockfile --ignore-optional --non-interactive --silent --network-timeout 600000
       - run: node --expose-gc node_modules/jest/bin/jest --bail --colors --logHeapUsage --maxWorkers=2 --ci
 
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v2
         with:
           file: ./coverage/coverage-final.json
       # - name: Save ESLint results as JSON for sonar
