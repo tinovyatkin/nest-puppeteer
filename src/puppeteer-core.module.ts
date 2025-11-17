@@ -58,7 +58,7 @@ export class PuppeteerCoreModule
     const contextProvider = {
       provide: getContextToken(instanceName),
       async useFactory(browser: Browser) {
-        return browser.createIncognitoBrowserContext();
+        return browser.createBrowserContext();
       },
       inject: [getBrowserToken(instanceName)],
     };
@@ -105,7 +105,7 @@ export class PuppeteerCoreModule
     const contextProvider = {
       provide: getContextToken(puppeteerInstanceName),
       async useFactory(browser: Browser) {
-        return await browser.createIncognitoBrowserContext();
+        return await browser.createBrowserContext();
       },
       inject: [
         PUPPETEER_MODULE_OPTIONS,
