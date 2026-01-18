@@ -202,6 +202,64 @@ PuppeteerModule.forRoot({
 });
 ```
 
+## Testing
+
+When writing unit tests for controllers or services that inject Puppeteer dependencies, you can use the `createMockPuppeteerProviders()` helper to easily create mock providers with the correct injection tokens.
+
+```typescript
+import { Test } from '@nestjs/testing';
+import { createMockPuppeteerProviders } from 'nest-puppeteer';
+import { CrawlerService } from './crawler.service';
+
+describe('CrawlerService', () => {
+  let service: CrawlerService;
+  let mockPage: { goto: jest.Mock; content: jest.Mock };
+
+  beforeEach(async () => {
+    mockPage = {
+      goto: jest.fn().mockResolvedValue(null),
+      content: jest.fn().mockResolvedValue('<html>test</html>'),
+    };
+
+    const module = await Test.createTestingModule({
+      providers: [
+        CrawlerService,
+        ...createMockPuppeteerProviders({
+          page: mockPage,
+        }),
+      ],
+    }).compile();
+
+    service = module.get(CrawlerService);
+  });
+
+  it('should crawl a page', async () => {
+    const result = await service.crawl('https://example.com');
+
+    expect(mockPage.goto).toHaveBeenCalledWith('https://example.com', expect.anything());
+    expect(result.content).toBe('<html>test</html>');
+  });
+});
+```
+
+The `createMockPuppeteerProviders()` function accepts the following options:
+
+| Option | Description |
+|--------|-------------|
+| `instanceName` | The unique name for the Puppeteer instance (must match the name used in `forRoot`/`forRootAsync`) |
+| `browser` | Mock value for the Browser |
+| `context` | Mock value for the BrowserContext |
+| `page` | Mock value for the Page |
+
+For named instances:
+
+```typescript
+createMockPuppeteerProviders({
+  instanceName: 'secondary',
+  page: mockPage,
+});
+```
+
 ## Stay in touch
 
 - Author - [Konstantin Vyatkin](tino@vtkn.io)
