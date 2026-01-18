@@ -73,6 +73,20 @@ PuppeteerModule.forRoot({
 
 See the [Puppeteer troubleshooting guide](https://pptr.dev/troubleshooting#setting-up-chrome-linux-sandbox) for instructions on configuring Chrome sandboxing on Linux.
 
+#### Headless modes
+
+Chrome 112+ offers [two headless modes](https://developer.chrome.com/docs/chromium/headless):
+
+- `headless: true` — New unified headless mode (default)
+- `headless: 'shell'` — Legacy headless mode (chrome-headless-shell)
+- `headless: false` — Visible browser with UI
+
+```typescript
+PuppeteerModule.forRoot({
+  headless: 'shell', // Use legacy headless for compatibility
+})
+```
+
 If you need access to the default options for reference or custom merging, you can import them:
 
 ```typescript
