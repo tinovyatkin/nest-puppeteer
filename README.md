@@ -61,6 +61,18 @@ Default arguments include:
 - `--no-zygote`
 - `--no-sandbox` (Linux only)
 
+#### A note on `--no-sandbox`
+
+On Linux, we add `--no-sandbox` by default for compatibility with common environments. However, Puppeteer strongly recommends running Chrome with sandboxing enabled for security. To disable our default and run with proper sandboxing:
+
+```typescript
+PuppeteerModule.forRoot({
+  ignoreDefaultArgs: ['--no-sandbox', '--no-zygote'],
+})
+```
+
+See the [Puppeteer troubleshooting guide](https://pptr.dev/troubleshooting#setting-up-chrome-linux-sandbox) for instructions on configuring Chrome sandboxing on Linux.
+
 If you need access to the default options for reference or custom merging, you can import them:
 
 ```typescript
