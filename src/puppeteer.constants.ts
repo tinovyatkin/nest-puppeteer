@@ -9,6 +9,7 @@ const args: string[] = [
   "--allow-insecure-localhost", // Enables TLS/SSL errors on localhost to be ignored (no interstitial, no blocking of requests).
   "--allow-http-screen-capture", // Allow non-secure origins to use the screen capture API and the desktopCapture extension API.
   "--no-zygote", // https://codereview.chromium.org/2384163002
+  "--disable-blink-features=AutomationControlled", // Removes navigator.webdriver flag that indicates automation
 ];
 // add --no-sandbox when running on Linux, required with --no-zygote
 if (typeof process.getuid === "function") {
