@@ -8,4 +8,7 @@ export default defineConfig({
   sourcemap: false,
   target: "es2022",
   outDir: "dist",
+  outExtension({ format }) {
+    return { js: format === "cjs" ? ".cjs" : ".js" };
+  },
 });
