@@ -24,6 +24,28 @@ import type {
 } from "./interfaces/puppeteer-options.interface.js";
 import { getBrowserToken, getContextToken, getPageToken } from "./puppeteer.util.js";
 
+/**
+ * Merges user-provided launch options with defaults.
+ * User-provided args are appended to default args (de-duplicated).
+ */
+function mergeLaunchOptions(userOptions?: LaunchOptions): LaunchOptions {
+  if (!userOptions) {
+    return DEFAULT_CHROME_LAUNCH_OPTIONS;
+  }
+
+  const { args: userArgs, ...restUserOptions } = userOptions;
+  const defaultArgs = DEFAULT_CHROME_LAUNCH_OPTIONS.args ?? [];
+
+  // Merge args: default args + user args (de-duplicated)
+  const mergedArgs = userArgs ? [...new Set([...defaultArgs, ...userArgs])] : defaultArgs;
+
+  return {
+    ...DEFAULT_CHROME_LAUNCH_OPTIONS,
+    ...restUserOptions,
+    args: mergedArgs,
+  };
+}
+
 @Global()
 @Module({})
 export class PuppeteerCoreModule implements OnApplicationShutdown, OnModuleDestroy {
@@ -38,9 +60,11 @@ export class PuppeteerCoreModule implements OnApplicationShutdown, OnModuleDestr
   }
 
   static forRoot(
-    launchOptions: LaunchOptions = DEFAULT_CHROME_LAUNCH_OPTIONS,
+    launchOptions?: LaunchOptions,
     instanceName: string = DEFAULT_PUPPETEER_INSTANCE_NAME,
   ): DynamicModule {
+    const mergedLaunchOptions = mergeLaunchOptions(launchOptions);
+
     const instanceNameProvider = {
       provide: PUPPETEER_INSTANCE_NAME,
       useValue: instanceName,
@@ -49,7 +73,7 @@ export class PuppeteerCoreModule implements OnApplicationShutdown, OnModuleDestr
     const browserProvider = {
       provide: getBrowserToken(instanceName),
       async useFactory() {
-        return await puppeteer.launch(launchOptions);
+        return await puppeteer.launch(mergedLaunchOptions);
       },
     };
 
@@ -87,9 +111,7 @@ export class PuppeteerCoreModule implements OnApplicationShutdown, OnModuleDestr
     const browserProvider = {
       provide: getBrowserToken(puppeteerInstanceName),
       async useFactory(puppeteerModuleOptions: PuppeteerModuleOptions) {
-        return await puppeteer.launch(
-          puppeteerModuleOptions.launchOptions ?? DEFAULT_CHROME_LAUNCH_OPTIONS,
-        );
+        return await puppeteer.launch(mergeLaunchOptions(puppeteerModuleOptions.launchOptions));
       },
       inject: [PUPPETEER_MODULE_OPTIONS],
     };
@@ -135,7 +157,9 @@ export class PuppeteerCoreModule implements OnApplicationShutdown, OnModuleDestr
         await browser.close();
       }
     } catch (error) {
-      this.logger.error(`Failed to close browser: ${error instanceof Error ? error.message : error}`);
+      this.logger.error(
+        `Failed to close browser: ${error instanceof Error ? error.message : error}`,
+      );
     }
   }
 
