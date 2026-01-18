@@ -6,6 +6,7 @@ import {
   Provider,
   OnApplicationShutdown,
   OnModuleDestroy,
+  Logger,
 } from "@nestjs/common";
 import { ModuleRef } from "@nestjs/core";
 import type { Browser, BrowserContext, LaunchOptions } from "puppeteer";
@@ -26,6 +27,8 @@ import { getBrowserToken, getContextToken, getPageToken } from "./puppeteer.util
 @Global()
 @Module({})
 export class PuppeteerCoreModule implements OnApplicationShutdown, OnModuleDestroy {
+  private readonly logger = new Logger("PuppeteerModule");
+
   constructor(
     @Inject(PUPPETEER_INSTANCE_NAME) private readonly instanceName: string,
     private readonly moduleRef: ModuleRef,
@@ -126,7 +129,14 @@ export class PuppeteerCoreModule implements OnApplicationShutdown, OnModuleDestr
   async onModuleDestroy() {
     const browser: Browser = this.moduleRef.get(getBrowserToken(this.instanceName));
 
-    if (browser?.isConnected()) await browser.close();
+    try {
+      if (browser?.connected) {
+        this.logger.log("Closing browser...");
+        await browser.close();
+      }
+    } catch (error) {
+      this.logger.error(`Failed to close browser: ${error instanceof Error ? error.message : error}`);
+    }
   }
 
   private static createAsyncProviders(options: PuppeteerModuleAsyncOptions): Provider[] {
