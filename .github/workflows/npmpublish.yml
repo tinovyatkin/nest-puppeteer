@@ -23,6 +23,13 @@ jobs:
           node-version: 24
           cache: npm
 
+      # Enable Chrome sandbox support on Linux
+      # See: https://github.com/nicolo-ribaudo/nicolo-ribaudo/blob/main/puppeteer-headful/setup.sh
+      - name: Enable Chrome sandbox (Linux)
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0 || true
+          sudo sysctl -w kernel.unprivileged_userns_clone=1 || true
+
       - run: npm ci
 
       - run: npm run test:coverage
