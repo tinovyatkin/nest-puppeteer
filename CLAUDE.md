@@ -21,7 +21,7 @@ npm test              # Run e2e tests with Jest
 
 Run a specific test file:
 ```bash
-npm test -- --testPathPattern=app.e2e-spec
+npm test -- --testPathPattern=app.test
 ```
 
 ## Architecture
