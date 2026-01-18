@@ -1,8 +1,10 @@
 import { describe, it, beforeAll, afterAll, expect } from "@jest/globals";
-import { Test, TestingModule } from "@nestjs/testing";
-import type { Browser } from "puppeteer";
-import { PuppeteerModule, InjectBrowser, DEFAULT_CHROME_LAUNCH_OPTIONS } from "../src/index.js";
 import { Injectable, Module } from "@nestjs/common";
+import { TestingModule } from "@nestjs/testing";
+import { Test } from "@nestjs/testing";
+import { Browser } from "puppeteer";
+
+import { PuppeteerModule, InjectBrowser, DEFAULT_CHROME_LAUNCH_OPTIONS } from "../src/index.js";
 
 @Injectable()
 class BrowserService {

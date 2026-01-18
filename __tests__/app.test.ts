@@ -1,7 +1,9 @@
 import { describe, it, beforeAll, afterAll, expect } from "@jest/globals";
-import { Test, TestingModule } from "@nestjs/testing";
-import type { INestApplication } from "@nestjs/common";
+import { INestApplication } from "@nestjs/common";
+import { TestingModule } from "@nestjs/testing";
+import { Test } from "@nestjs/testing";
 import request from "supertest";
+
 import { AppModule } from "./test-server/app.module.js";
 
 describe("AppController (e2e)", () => {

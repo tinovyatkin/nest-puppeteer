@@ -1,7 +1,9 @@
 import { describe, it, beforeEach, expect, jest } from "@jest/globals";
-import { Test, TestingModule } from "@nestjs/testing";
 import { Controller, Injectable } from "@nestjs/common";
-import type { Browser, BrowserContext, Page } from "puppeteer";
+import { TestingModule } from "@nestjs/testing";
+import { Test } from "@nestjs/testing";
+import { Browser, BrowserContext, Page } from "puppeteer";
+
 import {
   createMockPuppeteerProviders,
   InjectBrowser,

@@ -1,7 +1,8 @@
 import { Controller, Post, Body, Get, Inject } from "@nestjs/common";
-import { CrawlerService } from "./crawler.service.js";
+import { BrowserContext, Browser } from "puppeteer";
+
 import { InjectContext, InjectBrowser } from "../../src/index.js";
-import type { BrowserContext, Browser } from "puppeteer";
+import { CrawlerService } from "./crawler.service.js";
 
 @Controller("crawler")
 export class CrawlerController {

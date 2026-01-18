@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+
 import { PuppeteerModule } from "../../src/index.js";
 import { CrawlerController } from "./crawler.controller.js";
 import { CrawlerService } from "./crawler.service.js";

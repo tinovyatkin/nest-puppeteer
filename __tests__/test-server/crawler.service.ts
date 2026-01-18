@@ -1,6 +1,7 @@
 import { Injectable } from "@nestjs/common";
+import { Page } from "puppeteer";
+
 import { InjectPage } from "../../src/index.js";
-import type { Page } from "puppeteer";
 
 @Injectable()
 export class CrawlerService {

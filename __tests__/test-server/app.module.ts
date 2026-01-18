@@ -1,9 +1,9 @@
 import { Module, Logger } from "@nestjs/common";
-import { AppController } from "./app.controller.js";
-import { AppService } from "./app.service.js";
-import type { Browser } from "puppeteer";
+import { Browser } from "puppeteer";
 
 import { PuppeteerModule, InjectBrowser } from "../../src/index.js";
+import { AppController } from "./app.controller.js";
+import { AppService } from "./app.service.js";
 import { CrawlerModule } from "./crawler.module.js";
 
 @Module({
