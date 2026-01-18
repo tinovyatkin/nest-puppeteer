@@ -2,50 +2,118 @@
 
 ## Description
 
-This is a Puppeteer module for [NestJS](https://nestjs.com/), making it easy to inject the [Puppeteer](https://github.com/puppeteer/puppeteer) into
-your project. It's modeled after the official modules, allowing for asynchronous configuration and such.
+A [NestJS](https://nestjs.com/) module that provides dependency injection for [Puppeteer](https://github.com/puppeteer/puppeteer), with support for
+sync/async configuration and named instances.
 
 ## Installation
 
-In your existing NestJS-based project:
+`puppeteer` is a peer dependency, so install it alongside `nest-puppeteer`:
 
 ```sh
 npm install nest-puppeteer puppeteer
-npm install -D @types/puppeteer
 ```
 
 ## Usage
 
-Overall, it works very similarly to any injectable module described in the NestJS documentation. You may want to refer to those docs as well -- and
-maybe the [dependency injection](https://docs.nestjs.com/fundamentals/custom-providers) docs too if you're still trying to wrap your head around the
-NestJS implementation of it.
+The API follows standard NestJS dynamic module patterns. If you’re new to Nest DI, see the
+[custom providers](https://docs.nestjs.com/fundamentals/custom-providers) docs.
 
-### Simple example
+### Quick start
 
-In the simplest case, you can explicitly specify options you'd normally provide to your `puppeteer.launch` or the instance name using
-`PuppeteerModule.forRoot()`:
+Register the module once (usually in `AppModule`). Use `isGlobal: true` if you want to inject Puppeteer in feature modules without re-importing.
 
-```typescript
+```ts
 import { Module } from "@nestjs/common";
 import { PuppeteerModule } from "nest-puppeteer";
 
 @Module({
   imports: [
+    PuppeteerModule.forRoot({
+      isGlobal: true,
+      // Any puppeteer.launch() options (optional)
+      // args, headless, executablePath, etc.
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+### Injecting Browser / Context / Page
+
+This module provides three injectable singletons per instance: `Browser`, `BrowserContext` (created via `browser.createBrowserContext()`), and a
+single `Page` created from that context.
+
+```ts
+import { Injectable } from "@nestjs/common";
+import type { Browser, BrowserContext, Page } from "puppeteer";
+import { InjectBrowser, InjectContext, InjectPage } from "nest-puppeteer";
+
+@Injectable()
+export class CrawlerService {
+  constructor(
+    @InjectBrowser() private readonly browser: Browser,
+    @InjectContext() private readonly context: BrowserContext,
+    @InjectPage() private readonly page: Page,
+  ) {}
+
+  async crawl(url: string) {
+    await this.page.goto(url, { waitUntil: "networkidle2" });
+    return this.page.content();
+  }
+
+  async crawlIsolated(url: string) {
+    const context = await this.browser.createBrowserContext();
+    const page = await context.newPage();
+    try {
+      await page.goto(url, { waitUntil: "networkidle2" });
+      return await page.content();
+    } finally {
+      await context.close();
+    }
+  }
+}
+```
+
+### Named instances
+
+If you need multiple browsers (e.g., different `executablePath` or profiles), pass an `instanceName` as the second argument to `forRoot` and to the
+`@Inject*()` decorators:
+
+```ts
+import { Module } from "@nestjs/common";
+import { PuppeteerModule } from "nest-puppeteer";
+
+@Module({
+  imports: [
+    PuppeteerModule.forRoot({ isGlobal: true }, "primary"),
     PuppeteerModule.forRoot(
-      { pipe: true }, // optional, any Puppeteer launch options here or leave empty for good defaults */,
-      "BrowserInstanceName", // optional, can be useful for using Chrome and Firefox in the same project
+      {
+        executablePath: "/path/to/chrome",
+      },
+      "secondary",
     ),
   ],
 })
-export class CatsModule {}
+export class AppModule {}
 ```
 
-### Chrome launch arguments
+```ts
+import { Injectable } from "@nestjs/common";
+import type { Browser } from "puppeteer";
+import { InjectBrowser } from "nest-puppeteer";
+
+@Injectable()
+export class BrowserService {
+  constructor(@InjectBrowser("secondary") private readonly browser: Browser) {}
+}
+```
+
+### Launch arguments & defaults
 
 When you provide custom `args` in your launch options, they are **merged** with the default arguments rather than replacing them. This ensures you
-don't accidentally lose important defaults like `--no-sandbox` on Linux.
+don't accidentally lose important defaults (e.g., `--no-sandbox` on Linux).
 
-```typescript
+```ts
 import { Module } from "@nestjs/common";
 import { PuppeteerModule } from "nest-puppeteer";
 
@@ -73,13 +141,13 @@ Default arguments include:
 On Linux, we add `--no-sandbox` by default for compatibility with common environments. However, Puppeteer strongly recommends running Chrome with
 sandboxing enabled for security. To disable our default and run with proper sandboxing:
 
-```typescript
+```ts
 PuppeteerModule.forRoot({
   ignoreDefaultArgs: ["--no-sandbox", "--no-zygote"],
 });
 ```
 
-See the [Puppeteer troubleshooting guide](https://pptr.dev/troubleshooting#setting-up-chrome-linux-sandbox) for instructions on configuring Chrome sandboxing on Linux.
+See the [Puppeteer troubleshooting guide](https://pptr.dev/troubleshooting#setting-up-chrome-linux-sandbox) for Linux sandbox setup.
 
 #### Headless modes
 
@@ -89,7 +157,7 @@ Chrome 112+ offers [two headless modes](https://developer.chrome.com/docs/chromi
 - `headless: 'shell'` — Legacy headless mode (chrome-headless-shell)
 - `headless: false` — Visible browser with UI
 
-```typescript
+```ts
 PuppeteerModule.forRoot({
   headless: "shell", // Use legacy headless for compatibility
 });
@@ -97,24 +165,16 @@ PuppeteerModule.forRoot({
 
 #### Automation detection
 
-The new Chrome headless mode (default since Chrome 112+) is essentially a full browser without a window, making it much harder to detect than the old
-headless mode. Most detection vectors that plagued earlier versions are now handled automatically:
-
-- User-agent no longer contains "HeadlessChrome"
-- `window.chrome.*` APIs are present
-- `navigator.plugins` and `navigator.mimeTypes` are populated
-- Window dimensions behave normally
-
 This module adds `--disable-blink-features=AutomationControlled` to the default launch arguments, which removes the `navigator.webdriver` flag — one
-of the few remaining automation indicators.
-
-**Note on puppeteer-extra-plugin-stealth:** If you're coming from puppeteer-extra, you'll find that most of its stealth plugin evasions are now
-unnecessary with the new headless mode. The plugin hasn't been actively maintained and many of its techniques target issues that Chrome has since
-fixed. For most use cases, the defaults provided by this module are sufficient.
+of the most common automation indicators. This does not make automation “undetectable”; adjust your strategy based on the target.
 
 If you need additional evasions (e.g., WebGL vendor spoofing), you can inject custom scripts via `page.evaluateOnNewDocument()`:
 
-```typescript
+```ts
+import { Injectable } from "@nestjs/common";
+import type { Page } from "puppeteer";
+import { InjectPage } from "nest-puppeteer";
+
 @Injectable()
 export class CrawlerService {
   constructor(@InjectPage() private readonly page: Page) {}
@@ -141,84 +201,10 @@ export class CrawlerService {
 
 If you need access to the default options for reference or custom merging, you can import them:
 
-```typescript
+```ts
 import { DEFAULT_CHROME_LAUNCH_OPTIONS } from "nest-puppeteer";
 
 console.log(DEFAULT_CHROME_LAUNCH_OPTIONS.args);
-```
-
-To inject the Puppeteer `Browser` object:
-
-```typescript
-import type { Browser } from "puppeteer";
-import { Injectable } from "@nestjs/common";
-import { InjectBrowser } from "nest-puppeteer";
-import { Cat } from "./interfaces/cat";
-
-@Injectable()
-export class CatsRepository {
-  constructor(@InjectBrowser() private readonly browser: Browser) {}
-
-  async create(cat: Cat) {
-    const version = await this.browser.version();
-    return { version };
-  }
-}
-```
-
-To inject a new incognito `BrowserContext` object:
-
-```typescript
-import { Module } from "@nestjs/common";
-import { PuppeteerModule } from "nest-puppeteer";
-import { CatsController } from "./cats.controller";
-import { CatsService } from "./cats.service";
-
-@Module({
-  imports: [PuppeteerModule.forFeature()],
-  controllers: [CatsController],
-  providers: [CatsService],
-})
-export class CatsModule {}
-```
-
-```typescript
-import type { BrowserContext } from "puppeteer";
-import { Injectable } from "@nestjs/common";
-import { InjectContext } from "nest-puppeteer";
-import { Cat } from "./interfaces/cat";
-
-@Injectable()
-export class CatsRepository {
-  constructor(
-    @InjectContext() private readonly browserContext: BrowserContext,
-  ) {}
-
-  async create(cat: Cat) {
-    const page = await this.browserContext.newPage();
-    await page.goto("https://test.com/");
-    return await page.content();
-  }
-}
-```
-
-Inject `Page` object:
-
-```typescript
-import { Injectable } from "@nestjs/common";
-import { InjectPage } from "nest-puppeteer";
-import type { Page } from "puppeteer";
-
-@Injectable()
-export class CrawlerService {
-  constructor(@InjectPage() private readonly page: Page) {}
-
-  async crawl(url: string) {
-    await this.page.goto(url, { waitUntil: "networkidle2" });
-    const content = await this.page.content();
-    return { content };
-  }
-}
 ```
 
 ### Asynchronous configuration
@@ -230,29 +216,32 @@ configuration asynchronously, using `PuppeteerModule.forRootAsync()`. There are 
 
 The first is to specify a factory function that populates the options:
 
-```typescript
-import { Module } from '@nestjs/common'
-import { PuppeteerModule } from 'nest-puppeteer'
-import { ConfigService } from '../config/config.service'
+```ts
+import { Module } from "@nestjs/common";
+import { PuppeteerModule } from "nest-puppeteer";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 
 @Module({
-    imports: [PuppeteerModule.forRootAsync({
-        imports: [ConfigModule],
-        useFactory: (config: ConfigService) => {
-            launchOptions: config.chromeLaunchOptions,
-        },
-        inject: [ConfigService]
-    })]
+  imports: [
+    PuppeteerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (config: ConfigService) => ({
+        launchOptions: config.get("PUPPETEER_LAUNCH_OPTIONS"),
+      }),
+      inject: [ConfigService],
+      isGlobal: true,
+    }),
+  ],
 })
-export class CatsModule {}
+export class AppModule {}
 ```
 
 #### Use a class
 
 Alternatively, you can write a class that implements the `PuppeteerOptionsFactory` interface and use that to create the options:
 
-```typescript
-import { Module } from "@nestjs/common";
+```ts
+import { Injectable, Module } from "@nestjs/common";
 import {
   PuppeteerModule,
   PuppeteerOptionsFactory,
@@ -261,13 +250,12 @@ import {
 
 @Injectable()
 export class PuppeteerConfigService implements PuppeteerOptionsFactory {
-  private readonly launchOptions = { pipe: true };
-  private readonly dbName = "BestAppEver";
-
-  createMongoOptions(): PuppeteerModuleOptions {
+  createPuppeteerOptions(): PuppeteerModuleOptions {
     return {
-      launchOptions: this.launchOptions,
-      instanceName: this.instanceName,
+      launchOptions: {
+        // Any puppeteer.launch() options here
+        args: ["--window-size=1280,720"],
+      },
     };
   }
 }
@@ -276,10 +264,11 @@ export class PuppeteerConfigService implements PuppeteerOptionsFactory {
   imports: [
     PuppeteerModule.forRootAsync({
       useClass: PuppeteerConfigService,
+      isGlobal: true,
     }),
   ],
 })
-export class CatsModule {}
+export class AppModule {}
 ```
 
 Just be aware that the `useClass` option will instantiate your class inside the PuppeteerModule, which may not be what you want.
@@ -288,40 +277,32 @@ Just be aware that the `useClass` option will instantiate your class inside the 
 
 If you wish to instead import your PuppeteerConfigService class from a different module, the `useExisting` option will allow you to do that.
 
-```typescript
-import { Module } from '@nestjs/common'
-import { PuppeteerModule } from 'nest-puppeteer'
-import { ConfigModule, ConfigService } from '../config/config.service'
+```ts
+import { Module } from "@nestjs/common";
+import { PuppeteerModule } from "nest-puppeteer";
+import { ConfigModule } from "./config.module";
+import { PuppeteerConfigService } from "./puppeteer-config.service";
 
 @Module({
-    imports: [PuppeteerModule.forRootAsync({
-        imports: [ConfigModule]
-        useExisting: ConfigService
-    })]
+  imports: [
+    PuppeteerModule.forRootAsync({
+      imports: [ConfigModule],
+      useExisting: PuppeteerConfigService,
+      isGlobal: true,
+    }),
+  ],
 })
-export class CatsModule {}
+export class AppModule {}
 ```
 
-In this example, we're assuming that `ConfigService` implements the `PuppeteerOptionsFactory` interface and can be found in the ConfigModule.
-
-#### Use module globally
-
-When you want to use `PuppeteerModule` in other modules, you'll need to import it (as is standard with any Nest module). Alternatively, declare it as
-a [global module](https://docs.nestjs.com/modules#global-modules) by setting the options object's `isGlobal` property to `true`, as shown below. In
-that case, you will not need to import `PuppeteerModule` in other modules once it's been loaded in the root module (e.g., `AppModule`).
-
-```typescript
-PuppeteerModule.forRoot({
-  isGlobal: true,
-});
-```
+In this example, `PuppeteerConfigService` is provided by `ConfigModule` and implements `PuppeteerOptionsFactory`.
 
 ## Testing
 
 When writing unit tests for controllers or services that inject Puppeteer dependencies, you can use the `createMockPuppeteerProviders()` helper to
 easily create mock providers with the correct injection tokens.
 
-```typescript
+```ts
 import { Test } from "@nestjs/testing";
 import { createMockPuppeteerProviders } from "nest-puppeteer";
 import { CrawlerService } from "./crawler.service";
@@ -371,7 +352,7 @@ The `createMockPuppeteerProviders()` function accepts the following options:
 
 For named instances:
 
-```typescript
+```ts
 createMockPuppeteerProviders({
   instanceName: "secondary",
   page: mockPage,
@@ -380,7 +361,7 @@ createMockPuppeteerProviders({
 
 ## Stay in touch
 
-- Author - [Konstantin Vyatkin](tino@vtkn.io)
+- Author - Konstantin Vyatkin <tino@vtkn.io>
 
 ## License
 
