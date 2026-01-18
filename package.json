@@ -34,8 +34,8 @@
     "format:check": "oxfmt --check ./src ./__tests__",
     "typecheck": "tsgo --noEmit",
     "prepublishOnly": "npm run build",
-    "test": "NODE_OPTIONS='--experimental-vm-modules' jest --config jest.config.json",
-    "test:coverage": "NODE_OPTIONS='--experimental-vm-modules' jest --config jest.config.json --coverage"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.json",
+    "test:coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.json --coverage"
   },
   "peerDependencies": {
     "@nestjs/common": ">=10",
@@ -54,6 +54,7 @@
     "@types/node": "22.16.3",
     "@types/supertest": "6.0.3",
     "@typescript/native-preview": "7.0.0-dev.20260118.1",
+    "cross-env": "10.1.0",
     "jest": "30.2.0",
     "oxfmt": "0.24.0",
     "oxlint": "1.39.0",
