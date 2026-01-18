@@ -8,12 +8,12 @@
     "christian-kohler.npm-intellisense",
     "christian-kohler.path-intellisense",
     "codezombiech.gitignore",
-    "dbaeumer.vscode-eslint",
     "drKnoxy.eslint-disable-snippets",
-    "esbenp.prettier-vscode",
     "github.vscode-pull-request-github",
     "Orta.vscode-jest",
     "redhat.vscode-yaml",
-    "streetsidesoftware.code-spell-checker"
+    "streetsidesoftware.code-spell-checker",
+    "oxc.oxc-vscode",
+    "typescriptteam.native-preview"
   ]
 }

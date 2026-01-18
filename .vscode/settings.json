@@ -1,32 +1,9 @@
 {
-  "eslint.enable": true,
-  // prevent watch task failures on lint errors
-  "eslint.validate": ["javascript", "typescript"],
-  "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit"
-  },
-  // switch off default VSCode formatting rules
-  "javascript.format.enable": false,
-  "typescript.surveys.enabled": false,
-  "typescript.implementationsCodeLens.enabled": true,
-  "typescript.referencesCodeLens.enabled": true,
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "eslint.enable": false,
   "yaml.format.enable": true,
   "typescript.format.enable": false,
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[yaml]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "[typescript][javascript][json][yaml]": {
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "search.exclude": {
     "**/node_modules": true,
