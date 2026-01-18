@@ -87,6 +87,8 @@
         "typescript/no-unsafe-member-access": "off",
         "typescript/no-unsafe-type-assertion": "off",
         "typescript/strict-boolean-expressions": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-assignment": "off",
         "no-console": "off"
       }
     }

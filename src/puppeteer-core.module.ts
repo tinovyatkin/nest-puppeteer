@@ -1,18 +1,26 @@
-import { DynamicModule, Provider, OnApplicationShutdown, OnModuleDestroy } from "@nestjs/common";
-import { Module, Inject, Global, Logger } from "@nestjs/common";
+import {
+  DynamicModule,
+  Global,
+  Inject,
+  Logger,
+  Module,
+  OnApplicationShutdown,
+  OnModuleDestroy,
+  Provider,
+} from "@nestjs/common";
 import { ModuleRef } from "@nestjs/core";
-import { Browser, BrowserContext, LaunchOptions } from "puppeteer";
-import puppeteer from "puppeteer";
+import util from "node:util";
+import puppeteer, { Browser, BrowserContext, LaunchOptions } from "puppeteer";
 
 import {
   PuppeteerModuleAsyncOptions,
-  PuppeteerOptionsFactory,
   PuppeteerModuleOptions,
+  PuppeteerOptionsFactory,
 } from "./interfaces/puppeteer-options.interface.js";
 import {
-  PUPPETEER_INSTANCE_NAME,
-  DEFAULT_PUPPETEER_INSTANCE_NAME,
   DEFAULT_CHROME_LAUNCH_OPTIONS,
+  DEFAULT_PUPPETEER_INSTANCE_NAME,
+  PUPPETEER_INSTANCE_NAME,
   PUPPETEER_MODULE_OPTIONS,
 } from "./puppeteer.constants.js";
 import { getBrowserToken, getContextToken, getPageToken } from "./puppeteer.util.js";
@@ -162,7 +170,7 @@ export class PuppeteerCoreModule implements OnApplicationShutdown, OnModuleDestr
       }
     } catch (error) {
       this.logger.error(
-        `Failed to close browser: ${error instanceof Error ? error.message : error}`,
+        `Failed to close browser: ${error instanceof Error ? error.message : util.inspect(error)}`,
       );
     }
   }
