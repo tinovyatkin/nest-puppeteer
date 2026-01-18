@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=https://json.schemastore.org/commitlintrc.json
+
+rules:
+  # Scope rules
+  # Make scope optional by disabling the scope-empty rule
+  scope-empty:
+    - 0 # disabled
+    - always
+
+  # Body rules
+  body-leading-blank:
+    - 1 # warning
+    - always
+  body-max-line-length:
+    - 2 # error
+    - always
+    - 400 # increased from 100 for comprehensive AI messages
+
+  # Footer rules
+  footer-leading-blank:
+    - 1 # warning
+    - always
+  footer-max-line-length:
+    - 2 # error
+    - always
+    - 150 # increased from 100
+
+  # Header rules
+  header-max-length:
+    - 2 # error
+    - always
+    - 150 # increased from 100 for AI-generated comprehensive commit titles
+  header-trim:
+    - 2 # error
+    - always
+
+  # Subject rules
+  subject-case:
+    - 2 # error
+    - never
+    - - sentence-case
+      - start-case
+      - pascal-case
+      - upper-case
+  subject-empty:
+    - 2 # error
+    - never
+  subject-full-stop:
+    - 2 # error
+    - never
+    - "."
+
+  # Type rules
+  type-case:
+    - 2 # error
+    - always
+    - lower-case
+  type-empty:
+    - 2 # error
+    - never
+  type-enum:
+    - 2 # error
+    - always
+    - - build
+      - chore
+      - ci
+      - ai
+      - docs
+      - feat
+      - fix
+      - perf
+      - refactor
+      - revert
+      - style
+      - test

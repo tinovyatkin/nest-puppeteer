@@ -3,8 +3,13 @@
   "yaml.format.enable": true,
   "typescript.format.enable": false,
   "[typescript][javascript][json][yaml]": {
-    "editor.defaultFormatter": "oxc.oxc-vscode"
+    "editor.defaultFormatter": "oxc.oxc-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.oxc": "explicit",
+      "source.organizeImports": "explicit"
+    }
   },
+  "cSpell.enabled": false,
   "search.exclude": {
     "**/node_modules": true,
     "**/coverage": true,
@@ -15,12 +20,6 @@
   // for Windows collaborators
   "files.eol": "\n",
   "files.encoding": "utf8",
-  // associations for some files this project is using
-  "files.associations": {
-    ".huskyrc": "jsonc",
-    ".npmpackagejsonlintrc.json": "jsonc",
-    ".npmrc": "ini"
-  },
   "files.watcherExclude": {
     "**/.git/objects/**": true,
     "**/.git/subtree-cache/**": true,
@@ -43,20 +42,19 @@
   "npm.packageManager": "yarn",
   "npm.fetchOnlinePackageInfo": true,
   "npm.enableScriptExplorer": true,
-  "json.schemas": [
-    // Husky config file
-    {
-      "fileMatch": [".huskyrc"],
-      "url": "http://json.schemastore.org/huskyrc"
+  "[markdown]": {
+    "editor.unicodeHighlight.ambiguousCharacters": true,
+    "editor.unicodeHighlight.invisibleCharacters": true,
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
     },
-    // Prettier config
-    {
-      "fileMatch": [".prettierrc.json"],
-      "url": "http://json.schemastore.org/prettierrc"
-    },
-    {
-      "fileMatch": [".npmpackagejsonlintrc.json"],
-      "url": "http://json.schemastore.org/npmpackagejsonlintrc"
+    "editor.defaultFormatter": "rvben.rumdl",
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit"
     }
-  ]
+  }
 }

@@ -1,0 +1,15 @@
+[default]
+extend-ignore-re = [
+    "(?Rm)^.*(#|//)\\s*cspell:disable-line$",
+    "(?Rm)^.*(<!--|#|//)\\s*spellchecker:disable-line(-->|\\n)?$",
+    "(?i)(https?|file|mailto|s3):\\/\\/[^\\s]+",
+    "(?i)arn:[^\\s]+",
+    "(?s)(<!--|#|//)\\s*spell-checker:\\s*disable.*?\\n\\s*(<!--|#|//)\\s*spell-checker:\\s*enable",
+    "(?s)(<!--|#|//)\\s*spellchecker:off.*?\\n\\s*(<!--|#|//)\\s*spellchecker:on",
+    "np.arange",
+]
+
+[default.extend-words]
+
+[files]
+ignore-vcs = true

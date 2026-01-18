@@ -2,7 +2,7 @@
   "testEnvironment": "node",
   "testMatch": ["**/__tests__/**/*.test.ts"],
   "transform": {
-    "^.+\\.ts$": ["ts-jest", { "useESM": true }]
+    "^.+\\.(t|j)sx?$": "@swc/jest"
   },
   "extensionsToTreatAsEsm": [".ts"],
   "moduleNameMapper": {
@@ -10,5 +10,6 @@
   },
   "collectCoverageFrom": ["src/**/*.ts"],
   "coverageDirectory": "coverage",
+  "coverageProvider": "v8",
   "testTimeout": 60000
 }

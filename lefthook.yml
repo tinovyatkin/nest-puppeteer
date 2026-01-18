@@ -1,0 +1,58 @@
+# yaml-language-server: =https://json.schemastore.org/lefthook.json
+output:
+  # - summary # Print summary block (successful and failed steps)
+  # - empty_summary # Print summary heading when there are no steps to run
+  - failure # Print failed steps printing
+# - skips # Print "skip" (i.e. no files matched)
+assert_lefthook_installed: true
+pre-commit:
+  commands:
+    typecheck:
+      glob: "**/*.ts"
+      run: npx -y -q tsgo --noEmit
+    lint:
+      glob: "*.{js,ts,cjs,mjs,d.cts,d.mts}"
+      run: npx -y -q oxlint --fix --fix-suggestions {staged_files}
+      stage_fixed: true
+    format:
+      glob: "*.{js,ts,cjs,mjs,mts,cts,jsx,tsx,json,yml,yaml}"
+      run: npx -y -q oxfmt --no-error-on-unmatched-pattern --write {staged_files}
+      stage_fixed: true
+    taplo:
+      glob: "**/*.toml"
+      run: npx -y -q taplo format {staged_files}
+      stage_fixed: true
+    rumdl:
+      glob: "**/*.md"
+      run: uv tool run rumdl check --fix --output-format concise {staged_files}
+    yamllint:
+      glob: "*.{yml,yaml}"
+      run: uvx yamllint {staged_files}
+    typos:
+      glob: "*.{py,js,ts,tsx,toml,yaml,yml,json,html,css,md,txt,rst,tex}"
+      run: uv tool run typos --force-exclude {staged_files}
+    codecov:
+      glob: ".codecov.yml"
+      run: curl --fail --data-binary @.codecov.yml https://codecov.io/validate
+    renovate:
+      glob: "renovate.json"
+      run: npx -y -q -y --package renovate renovate-config-validator renovate.json
+    actionlint:
+      glob: ".github/workflows/*.{yaml,yml}"
+      run: actionlint {staged_files}
+    commitlint-config:
+      glob: ".commitlintrc.yaml"
+      run: uvx check-jsonschema --schemafile https://json.schemastore.org/commitlintrc.json .commitlintrc.yaml
+
+commit-msg:
+  commands:
+    "lint commit message":
+      run: npx -y -q commitlint --edit {1}
+    "check spelling":
+      run: uv tool run typos {1}
+
+post-merge:
+  files: "git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD"
+  commands:
+    delete-merged-branches:
+      run: git branch --merged | grep -Ev '\*|master|main|dev|develop|development|stag|staging|prod|production' | xargs git branch -d; git fetch --prune;

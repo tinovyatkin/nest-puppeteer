@@ -14,6 +14,10 @@
     "redhat.vscode-yaml",
     "streetsidesoftware.code-spell-checker",
     "oxc.oxc-vscode",
-    "typescriptteam.native-preview"
+    "typescriptteam.native-preview",
+    "sonarsource.sonarlint-vscode",
+    "rvben.rumdl",
+    "joshbolduc.commitlint",
+    "tekumara.typos-vscode"
   ]
 }

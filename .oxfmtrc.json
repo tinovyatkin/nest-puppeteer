@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 100,
+  "semi": true,
+  "trailingComma": "all",
+  "endOfLine": "lf",
+  "singleAttributePerLine": true,
+  "experimentalSortImports": {
+    "order": "asc",
+    "ignoreCase": true,
+    "newlinesBetween": true
+  }
+}
