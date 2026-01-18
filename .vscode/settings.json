@@ -3,7 +3,7 @@
   // prevent watch task failures on lint errors
   "eslint.validate": ["javascript", "typescript"],
   "editor.codeActionsOnSave": {
-    "source.fixAll": true
+    "source.fixAll": "explicit"
   },
   // switch off default VSCode formatting rules
   "javascript.format.enable": false,

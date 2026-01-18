@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "jest", "import"],
+  "env": {
+    "node": true
+  },
+  "rules": {
+    "no-unused-vars": "warn",
+    "no-console": "off",
+    "typescript/no-explicit-any": "warn",
+    "typescript/explicit-function-return-type": "off",
+    "typescript/explicit-module-boundary-types": "off",
+    "import/no-unresolved": "off",
+    "jest/expect-expect": "off"
+  },
+  "ignorePatterns": ["dist", "node_modules", "coverage", "reports"]
+}
