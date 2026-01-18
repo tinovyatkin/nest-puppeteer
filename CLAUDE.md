@@ -56,7 +56,8 @@ Tests are e2e only, located in `__tests__/`. The test server in `__tests__/test-
 
 ## Tooling
 
-- **TypeScript**: Uses `@typescript/native-preview` (tsgo) for fast compilation
+- **Build**: Uses tsup for dual ESM/CJS output with TypeScript declarations
+- **Type Check**: Uses `@typescript/native-preview` (tsgo) for fast type checking
 - **Linting**: Uses oxlint (Oxc linter) for fast linting
 - **Formatting**: Uses oxfmt (Oxc formatter) for code formatting
-- **Testing**: Jest 30 with ts-jest for ESM support
+- **Testing**: Jest 29 with ts-jest for ESM support

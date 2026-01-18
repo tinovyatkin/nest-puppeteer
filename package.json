@@ -13,21 +13,21 @@
   },
   "version": "3.0.0",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
-    "dist/**/*.d.ts",
-    "dist/**/*.js"
+    "dist"
   ],
   "scripts": {
-    "prebuild": "rimraf dist",
-    "build": "tsgo --project tsconfig.build.json",
+    "build": "tsup",
     "lint": "oxlint ./src ./__tests__",
     "lint:fix": "oxlint ./src ./__tests__ --fix",
     "format": "oxfmt --write ./src ./__tests__",
@@ -59,10 +59,10 @@
     "oxlint": "1.39.0",
     "puppeteer": "24.35.0",
     "reflect-metadata": "0.2.2",
-    "rimraf": "6.0.1",
     "rxjs": "7.8.2",
     "supertest": "7.2.2",
-    "ts-jest": "29.3.4"
+    "ts-jest": "29.3.4",
+    "tsup": "8.5.1"
   },
   "keywords": [
     "browser",
