@@ -156,11 +156,16 @@ describe("Launch Args Merging", () => {
     let browserService: BrowserService;
 
     beforeAll(async () => {
+      // When ignoreDefaultArgs is true, we must provide essential args for CI
+      // (--no-sandbox is required on Linux)
+      const essentialArgs =
+        typeof process.getuid === "function" ? ["--no-sandbox", "--no-zygote"] : [];
+
       @Module({
         imports: [
           PuppeteerModule.forRoot({
             ignoreDefaultArgs: true,
-            args: ["--custom-only-arg"],
+            args: [...essentialArgs, "--custom-only-arg"],
           }),
         ],
         providers: [BrowserService],
@@ -182,8 +187,9 @@ describe("Launch Args Merging", () => {
       const process = browserService.browser.process();
       expect(process).toBeDefined();
       const spawnargs = process?.spawnargs ?? [];
-      // Default args should NOT be present
+      // Non-essential default args should NOT be present
       expect(spawnargs.some((arg) => arg.includes("--allow-insecure-localhost"))).toBe(false);
+      expect(spawnargs.some((arg) => arg.includes("--allow-http-screen-capture"))).toBe(false);
       // Custom args should be present
       expect(spawnargs.some((arg) => arg.includes("--custom-only-arg"))).toBe(true);
     });
