@@ -22,6 +22,7 @@ describe("Launch Args Merging", () => {
       expect(args).toContain("--allow-insecure-localhost");
       expect(args).toContain("--allow-http-screen-capture");
       expect(args).toContain("--no-zygote");
+      expect(args).toContain("--disable-blink-features=AutomationControlled");
     });
   });
 

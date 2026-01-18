@@ -60,6 +60,7 @@ Default arguments include:
 - `--allow-http-screen-capture`
 - `--no-zygote`
 - `--no-sandbox` (Linux only)
+- `--disable-blink-features=AutomationControlled` (removes automation detection flag)
 
 #### A note on `--no-sandbox`
 
@@ -85,6 +86,46 @@ Chrome 112+ offers [two headless modes](https://developer.chrome.com/docs/chromi
 PuppeteerModule.forRoot({
   headless: 'shell', // Use legacy headless for compatibility
 })
+```
+
+#### Automation detection
+
+The new Chrome headless mode (default since Chrome 112+) is essentially a full browser without a window, making it much harder to detect than the old headless mode. Most detection vectors that plagued earlier versions are now handled automatically:
+
+- User-agent no longer contains "HeadlessChrome"
+- `window.chrome.*` APIs are present
+- `navigator.plugins` and `navigator.mimeTypes` are populated
+- Window dimensions behave normally
+
+This module adds `--disable-blink-features=AutomationControlled` to the default launch arguments, which removes the `navigator.webdriver` flag — one of the few remaining automation indicators.
+
+**Note on puppeteer-extra-plugin-stealth:** If you're coming from puppeteer-extra, you'll find that most of its stealth plugin evasions are now unnecessary with the new headless mode. The plugin hasn't been actively maintained and many of its techniques target issues that Chrome has since fixed. For most use cases, the defaults provided by this module are sufficient.
+
+If you need additional evasions (e.g., WebGL vendor spoofing), you can inject custom scripts via `page.evaluateOnNewDocument()`:
+
+```typescript
+@Injectable()
+export class CrawlerService {
+  constructor(@InjectPage() private readonly page: Page) {}
+
+  async onModuleInit() {
+    // Optional: Override WebGL fingerprint
+    await this.page.evaluateOnNewDocument(() => {
+      const getParameterProxy = new Proxy(
+        WebGLRenderingContext.prototype.getParameter,
+        {
+          apply(target, thisArg, args) {
+            if (args[0] === 37445) return 'Intel Inc.'; // UNMASKED_VENDOR_WEBGL
+            if (args[0] === 37446) return 'Intel Iris OpenGL Engine'; // UNMASKED_RENDERER_WEBGL
+            return Reflect.apply(target, thisArg, args);
+          },
+        }
+      );
+      WebGLRenderingContext.prototype.getParameter = getParameterProxy;
+      WebGL2RenderingContext.prototype.getParameter = getParameterProxy;
+    });
+  }
+}
 ```
 
 If you need access to the default options for reference or custom merging, you can import them:
