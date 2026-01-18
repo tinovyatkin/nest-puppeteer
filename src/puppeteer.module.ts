@@ -23,7 +23,8 @@ export class PuppeteerModule {
   ): DynamicModule {
     const { isGlobal, ...launchOptions } = options ?? {};
     // Pass undefined if no launch options provided to use defaults
-    const effectiveLaunchOptions = Object.keys(launchOptions).length > 0 ? launchOptions : undefined;
+    const effectiveLaunchOptions =
+      Object.keys(launchOptions).length > 0 ? launchOptions : undefined;
     return {
       module: PuppeteerModule,
       global: isGlobal,

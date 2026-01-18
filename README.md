@@ -36,6 +36,51 @@ import { PuppeteerModule } from 'nest-puppeteer';
 export class CatsModule {}
 ```
 
+### Chrome launch arguments
+
+When you provide custom `args` in your launch options, they are **merged** with the default arguments rather than replacing them. This ensures you don't accidentally lose important defaults like `--no-sandbox` on Linux.
+
+```typescript
+import { Module } from '@nestjs/common';
+import { PuppeteerModule } from 'nest-puppeteer';
+
+@Module({
+  imports: [
+    PuppeteerModule.forRoot({
+      // Your custom args are added to the defaults
+      args: ['--app', '--disable-gpu', '--window-size=800,600'],
+    }),
+  ],
+})
+export class AppModule {}
+```
+
+Default arguments include:
+- `--allow-insecure-localhost`
+- `--allow-http-screen-capture`
+- `--no-zygote`
+- `--no-sandbox` (Linux only)
+
+#### A note on `--no-sandbox`
+
+On Linux, we add `--no-sandbox` by default for compatibility with common environments. However, Puppeteer strongly recommends running Chrome with sandboxing enabled for security. To disable our default and run with proper sandboxing:
+
+```typescript
+PuppeteerModule.forRoot({
+  ignoreDefaultArgs: ['--no-sandbox', '--no-zygote'],
+})
+```
+
+See the [Puppeteer troubleshooting guide](https://pptr.dev/troubleshooting#setting-up-chrome-linux-sandbox) for instructions on configuring Chrome sandboxing on Linux.
+
+If you need access to the default options for reference or custom merging, you can import them:
+
+```typescript
+import { DEFAULT_CHROME_LAUNCH_OPTIONS } from 'nest-puppeteer';
+
+console.log(DEFAULT_CHROME_LAUNCH_OPTIONS.args);
+```
+
 To inject the Puppeteer `Browser` object:
 
 ```typescript
