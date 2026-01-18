@@ -150,4 +150,83 @@ describe("Launch Args Merging", () => {
       expect(spawnargs.some((arg) => arg.includes("--custom-arg"))).toBe(true);
     });
   });
+
+  describe("ignoreDefaultArgs: true", () => {
+    let module: TestingModule;
+    let browserService: BrowserService;
+
+    beforeAll(async () => {
+      @Module({
+        imports: [
+          PuppeteerModule.forRoot({
+            ignoreDefaultArgs: true,
+            args: ["--custom-only-arg"],
+          }),
+        ],
+        providers: [BrowserService],
+      })
+      class TestModule {}
+
+      module = await Test.createTestingModule({
+        imports: [TestModule],
+      }).compile();
+
+      browserService = module.get(BrowserService);
+    });
+
+    afterAll(async () => {
+      await module?.close();
+    });
+
+    it("should skip default args when ignoreDefaultArgs is true", () => {
+      const process = browserService.browser.process();
+      expect(process).toBeDefined();
+      const spawnargs = process?.spawnargs ?? [];
+      // Default args should NOT be present
+      expect(spawnargs.some((arg) => arg.includes("--allow-insecure-localhost"))).toBe(false);
+      // Custom args should be present
+      expect(spawnargs.some((arg) => arg.includes("--custom-only-arg"))).toBe(true);
+    });
+  });
+
+  describe("ignoreDefaultArgs: string[]", () => {
+    let module: TestingModule;
+    let browserService: BrowserService;
+
+    beforeAll(async () => {
+      @Module({
+        imports: [
+          PuppeteerModule.forRoot({
+            // Filter out specific default args
+            ignoreDefaultArgs: ["--no-zygote"],
+            args: ["--custom-arg"],
+          }),
+        ],
+        providers: [BrowserService],
+      })
+      class TestModule {}
+
+      module = await Test.createTestingModule({
+        imports: [TestModule],
+      }).compile();
+
+      browserService = module.get(BrowserService);
+    });
+
+    afterAll(async () => {
+      await module?.close();
+    });
+
+    it("should filter specific default args when ignoreDefaultArgs is an array", () => {
+      const process = browserService.browser.process();
+      expect(process).toBeDefined();
+      const spawnargs = process?.spawnargs ?? [];
+      // Filtered default arg should NOT be present
+      expect(spawnargs.some((arg) => arg === "--no-zygote")).toBe(false);
+      // Other default args should still be present
+      expect(spawnargs.some((arg) => arg.includes("--allow-insecure-localhost"))).toBe(true);
+      // Custom args should be present
+      expect(spawnargs.some((arg) => arg.includes("--custom-arg"))).toBe(true);
+    });
+  });
 });

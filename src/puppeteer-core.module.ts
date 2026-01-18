@@ -27,17 +27,28 @@ import { getBrowserToken, getContextToken, getPageToken } from "./puppeteer.util
 /**
  * Merges user-provided launch options with defaults.
  * User-provided args are appended to default args (de-duplicated).
+ * Respects Puppeteer's ignoreDefaultArgs option:
+ * - If true: skip default args entirely
+ * - If string[]: filter those specific args from defaults
+ * - Otherwise: merge as normal
  */
 function mergeLaunchOptions(userOptions?: LaunchOptions): LaunchOptions {
   if (!userOptions) {
     return DEFAULT_CHROME_LAUNCH_OPTIONS;
   }
 
-  const { args: userArgs, ...restUserOptions } = userOptions;
+  const { args: userArgs, ignoreDefaultArgs, ...restUserOptions } = userOptions;
   const defaultArgs = DEFAULT_CHROME_LAUNCH_OPTIONS.args ?? [];
 
-  // Merge args: default args + user args (de-duplicated)
-  const mergedArgs = userArgs ? [...new Set([...defaultArgs, ...userArgs])] : defaultArgs;
+  let mergedArgs: string[];
+  if (ignoreDefaultArgs === true) {
+    mergedArgs = userArgs ?? [];
+  } else if (Array.isArray(ignoreDefaultArgs)) {
+    const filteredDefaults = defaultArgs.filter((arg) => !ignoreDefaultArgs.includes(arg));
+    mergedArgs = userArgs ? [...new Set([...filteredDefaults, ...userArgs])] : filteredDefaults;
+  } else {
+    mergedArgs = userArgs ? [...new Set([...defaultArgs, ...userArgs])] : defaultArgs;
+  }
 
   return {
     ...DEFAULT_CHROME_LAUNCH_OPTIONS,
