@@ -1,22 +1,25 @@
-import { Controller, Post, Body, Get } from '@nestjs/common';
-import { CrawlerService } from './crawler.service';
-import { InjectContext } from '../../src/';
-import { BrowserContext } from 'puppeteer';
+import { Controller, Post, Body, Get, Inject } from "@nestjs/common";
+import { CrawlerService } from "./crawler.service.js";
+import { InjectContext, InjectBrowser } from "../../src/index.js";
+import type { BrowserContext, Browser } from "puppeteer";
 
-@Controller('crawler')
+@Controller("crawler")
 export class CrawlerController {
   constructor(
     @InjectContext() private readonly context: BrowserContext,
-    private readonly crawlerService: CrawlerService,
+    @InjectBrowser() private readonly browser: Browser,
+    @Inject(CrawlerService) private readonly crawlerService: CrawlerService,
   ) {}
 
-  @Post('/')
+  @Post("/")
   async crawl(@Body() params: { url: string }) {
     return this.crawlerService.crawl(params.url);
   }
 
-  @Get('/context')
+  @Get("/context")
   async contextType() {
-    return { incognito: this.context.isIncognito() };
+    const contexts = this.browser.browserContexts();
+    const isIncognito = contexts.indexOf(this.context) !== 0;
+    return { incognito: isIncognito };
   }
 }

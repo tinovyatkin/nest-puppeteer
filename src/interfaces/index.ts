@@ -1,1 +1,1 @@
-export * from './puppeteer-options.interface';
+export * from "./puppeteer-options.interface.js";

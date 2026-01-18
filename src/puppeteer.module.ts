@@ -1,10 +1,10 @@
-import { Module, DynamicModule } from '@nestjs/common';
-import { createPuppeteerProviders } from './puppeteer.providers';
-import { PuppeteerCoreModule } from './puppeteer-core.module';
+import { Module, DynamicModule } from "@nestjs/common";
+import { createPuppeteerProviders } from "./puppeteer.providers.js";
+import { PuppeteerCoreModule } from "./puppeteer-core.module.js";
 import type {
   PuppeteerModuleAsyncOptions,
   PuppeteerModuleOptions,
-} from './interfaces/puppeteer-options.interface';
+} from "./interfaces/puppeteer-options.interface.js";
 
 /**
  * Module for the Puppeteer
@@ -18,13 +18,16 @@ export class PuppeteerModule {
    * will be used.
    */
   static forRoot(
-    options?: PuppeteerModuleOptions['launchOptions'] & { isGlobal?: boolean },
+    options?: PuppeteerModuleOptions["launchOptions"] & { isGlobal?: boolean },
     instanceName?: string,
   ): DynamicModule {
+    const { isGlobal, ...launchOptions } = options ?? {};
+    // Pass undefined if no launch options provided to use defaults
+    const effectiveLaunchOptions = Object.keys(launchOptions).length > 0 ? launchOptions : undefined;
     return {
       module: PuppeteerModule,
-      global: options?.isGlobal,
-      imports: [PuppeteerCoreModule.forRoot(options, instanceName)],
+      global: isGlobal,
+      imports: [PuppeteerCoreModule.forRoot(effectiveLaunchOptions, instanceName)],
     };
   }
 
@@ -47,10 +50,7 @@ export class PuppeteerModule {
    * @param instanceName A unique name for the connection. If not specified, a default name
    * will be used.
    */
-  static forFeature(
-    pages: string[] = [],
-    instanceName?: string,
-  ): DynamicModule {
+  static forFeature(pages: string[] = [], instanceName?: string): DynamicModule {
     const providers = createPuppeteerProviders(instanceName, pages);
     return {
       module: PuppeteerModule,

@@ -6,31 +6,26 @@ import {
   Provider,
   OnApplicationShutdown,
   OnModuleDestroy,
-} from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core';
-import type { LaunchOptions, Browser, BrowserContext } from 'puppeteer';
-import { launch } from 'puppeteer';
+} from "@nestjs/common";
+import { ModuleRef } from "@nestjs/core";
+import type { Browser, BrowserContext, LaunchOptions } from "puppeteer";
+import puppeteer from "puppeteer";
 import {
   PUPPETEER_INSTANCE_NAME,
   DEFAULT_PUPPETEER_INSTANCE_NAME,
   DEFAULT_CHROME_LAUNCH_OPTIONS,
   PUPPETEER_MODULE_OPTIONS,
-} from './puppeteer.constants';
+} from "./puppeteer.constants.js";
 import type {
   PuppeteerModuleAsyncOptions,
   PuppeteerOptionsFactory,
   PuppeteerModuleOptions,
-} from './interfaces/puppeteer-options.interface';
-import {
-  getBrowserToken,
-  getContextToken,
-  getPageToken,
-} from './puppeteer.util';
+} from "./interfaces/puppeteer-options.interface.js";
+import { getBrowserToken, getContextToken, getPageToken } from "./puppeteer.util.js";
 
 @Global()
 @Module({})
-export class PuppeteerCoreModule
-  implements OnApplicationShutdown, OnModuleDestroy {
+export class PuppeteerCoreModule implements OnApplicationShutdown, OnModuleDestroy {
   constructor(
     @Inject(PUPPETEER_INSTANCE_NAME) private readonly instanceName: string,
     private readonly moduleRef: ModuleRef,
@@ -51,14 +46,14 @@ export class PuppeteerCoreModule
     const browserProvider = {
       provide: getBrowserToken(instanceName),
       async useFactory() {
-        return await launch(launchOptions);
+        return await puppeteer.launch(launchOptions);
       },
     };
 
     const contextProvider = {
       provide: getContextToken(instanceName),
       async useFactory(browser: Browser) {
-        return browser.createIncognitoBrowserContext();
+        return browser.createBrowserContext();
       },
       inject: [getBrowserToken(instanceName)],
     };
@@ -73,19 +68,13 @@ export class PuppeteerCoreModule
 
     return {
       module: PuppeteerCoreModule,
-      providers: [
-        instanceNameProvider,
-        browserProvider,
-        contextProvider,
-        pageProvider,
-      ],
+      providers: [instanceNameProvider, browserProvider, contextProvider, pageProvider],
       exports: [browserProvider, contextProvider, pageProvider],
     };
   }
 
   static forRootAsync(options: PuppeteerModuleAsyncOptions): DynamicModule {
-    const puppeteerInstanceName =
-      options.instanceName ?? DEFAULT_PUPPETEER_INSTANCE_NAME;
+    const puppeteerInstanceName = options.instanceName ?? DEFAULT_PUPPETEER_INSTANCE_NAME;
 
     const instanceNameProvider = {
       provide: PUPPETEER_INSTANCE_NAME,
@@ -95,7 +84,7 @@ export class PuppeteerCoreModule
     const browserProvider = {
       provide: getBrowserToken(puppeteerInstanceName),
       async useFactory(puppeteerModuleOptions: PuppeteerModuleOptions) {
-        return await launch(
+        return await puppeteer.launch(
           puppeteerModuleOptions.launchOptions ?? DEFAULT_CHROME_LAUNCH_OPTIONS,
         );
       },
@@ -105,12 +94,9 @@ export class PuppeteerCoreModule
     const contextProvider = {
       provide: getContextToken(puppeteerInstanceName),
       async useFactory(browser: Browser) {
-        return await browser.createIncognitoBrowserContext();
+        return await browser.createBrowserContext();
       },
-      inject: [
-        PUPPETEER_MODULE_OPTIONS,
-        getBrowserToken(puppeteerInstanceName),
-      ],
+      inject: [getBrowserToken(puppeteerInstanceName)],
     };
 
     const pageProvider = {
@@ -118,10 +104,7 @@ export class PuppeteerCoreModule
       async useFactory(context: BrowserContext) {
         return await context.newPage();
       },
-      inject: [
-        PUPPETEER_MODULE_OPTIONS,
-        getContextToken(puppeteerInstanceName),
-      ],
+      inject: [getContextToken(puppeteerInstanceName)],
     };
 
     const asyncProviders = this.createAsyncProviders(options);
@@ -141,16 +124,12 @@ export class PuppeteerCoreModule
   }
 
   async onModuleDestroy() {
-    const browser: Browser = this.moduleRef.get(
-      getBrowserToken(this.instanceName),
-    );
+    const browser: Browser = this.moduleRef.get(getBrowserToken(this.instanceName));
 
     if (browser?.isConnected()) await browser.close();
   }
 
-  private static createAsyncProviders(
-    options: PuppeteerModuleAsyncOptions,
-  ): Provider[] {
+  private static createAsyncProviders(options: PuppeteerModuleAsyncOptions): Provider[] {
     if (options.useExisting || options.useFactory) {
       return [this.createAsyncOptionsProvider(options)];
     } else if (options.useClass) {
@@ -166,9 +145,7 @@ export class PuppeteerCoreModule
     }
   }
 
-  private static createAsyncOptionsProvider(
-    options: PuppeteerModuleAsyncOptions,
-  ): Provider {
+  private static createAsyncOptionsProvider(options: PuppeteerModuleAsyncOptions): Provider {
     if (options.useFactory) {
       return {
         provide: PUPPETEER_MODULE_OPTIONS,
@@ -192,7 +169,7 @@ export class PuppeteerCoreModule
         inject: [options.useClass],
       };
     } else {
-      throw new Error('Invalid PuppeteerModule options');
+      throw new Error("Invalid PuppeteerModule options");
     }
   }
 }
