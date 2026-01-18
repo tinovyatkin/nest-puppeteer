@@ -16,17 +16,17 @@ export interface MockPuppeteerOptions {
    * Mock value for the Browser. If not provided, an empty object is used.
    * Can be a partial Browser object or any mock implementation.
    */
-  browser?: Partial<Browser> | unknown;
+  browser?: Partial<Browser>;
   /**
    * Mock value for the BrowserContext. If not provided, an empty object is used.
    * Can be a partial BrowserContext object or any mock implementation.
    */
-  context?: Partial<BrowserContext> | unknown;
+  context?: Partial<BrowserContext>;
   /**
    * Mock value for the Page. If not provided, an empty object is used.
    * Can be a partial Page object or any mock implementation.
    */
-  page?: Partial<Page> | unknown;
+  page?: Partial<Page>;
 }
 
 /**
