@@ -1,5 +1,6 @@
-import type { Provider } from "@nestjs/common";
-import type { Browser, BrowserContext, Page } from "puppeteer";
+import { Provider } from "@nestjs/common";
+import { Browser, BrowserContext, Page } from "puppeteer";
+
 import { getBrowserToken, getContextToken, getPageToken } from "./puppeteer.util.js";
 
 /**

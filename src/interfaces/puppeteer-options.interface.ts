@@ -1,5 +1,5 @@
-import type { ModuleMetadata, Type, InjectionToken } from "@nestjs/common";
-import type { LaunchOptions } from "puppeteer";
+import { ModuleMetadata, Type, InjectionToken } from "@nestjs/common";
+import { LaunchOptions } from "puppeteer";
 
 /**
  * Options that ultimately need to be provided to create a Puppeteer instance

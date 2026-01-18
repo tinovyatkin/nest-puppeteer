@@ -1,10 +1,12 @@
-import { Module, DynamicModule } from "@nestjs/common";
-import { createPuppeteerProviders } from "./puppeteer.providers.js";
-import { PuppeteerCoreModule } from "./puppeteer-core.module.js";
-import type {
+import { DynamicModule } from "@nestjs/common";
+import { Module } from "@nestjs/common";
+
+import {
   PuppeteerModuleAsyncOptions,
   PuppeteerModuleOptions,
 } from "./interfaces/puppeteer-options.interface.js";
+import { PuppeteerCoreModule } from "./puppeteer-core.module.js";
+import { createPuppeteerProviders } from "./puppeteer.providers.js";
 
 /**
  * Module for the Puppeteer

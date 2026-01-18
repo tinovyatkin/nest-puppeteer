@@ -1,4 +1,4 @@
-import type { LaunchOptions } from "puppeteer";
+import { LaunchOptions } from "puppeteer";
 
 export const PUPPETEER_INSTANCE_NAME = "PuppeteerInstanceName";
 export const PUPPETEER_MODULE_OPTIONS = "PuppeteerModuleOptions";

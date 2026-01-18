@@ -1,4 +1,5 @@
 import { Inject } from "@nestjs/common";
+
 import { getBrowserToken, getContextToken, getPageToken } from "./puppeteer.util.js";
 
 /**

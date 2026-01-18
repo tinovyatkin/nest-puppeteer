@@ -1,27 +1,20 @@
-import {
-  Module,
-  Inject,
-  Global,
-  DynamicModule,
-  Provider,
-  OnApplicationShutdown,
-  OnModuleDestroy,
-  Logger,
-} from "@nestjs/common";
+import { DynamicModule, Provider, OnApplicationShutdown, OnModuleDestroy } from "@nestjs/common";
+import { Module, Inject, Global, Logger } from "@nestjs/common";
 import { ModuleRef } from "@nestjs/core";
-import type { Browser, BrowserContext, LaunchOptions } from "puppeteer";
+import { Browser, BrowserContext, LaunchOptions } from "puppeteer";
 import puppeteer from "puppeteer";
+
+import {
+  PuppeteerModuleAsyncOptions,
+  PuppeteerOptionsFactory,
+  PuppeteerModuleOptions,
+} from "./interfaces/puppeteer-options.interface.js";
 import {
   PUPPETEER_INSTANCE_NAME,
   DEFAULT_PUPPETEER_INSTANCE_NAME,
   DEFAULT_CHROME_LAUNCH_OPTIONS,
   PUPPETEER_MODULE_OPTIONS,
 } from "./puppeteer.constants.js";
-import type {
-  PuppeteerModuleAsyncOptions,
-  PuppeteerOptionsFactory,
-  PuppeteerModuleOptions,
-} from "./interfaces/puppeteer-options.interface.js";
 import { getBrowserToken, getContextToken, getPageToken } from "./puppeteer.util.js";
 
 /**
