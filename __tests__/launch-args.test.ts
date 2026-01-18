@@ -233,4 +233,44 @@ describe("Launch Args Merging", () => {
       expect(spawnargs.some((arg) => arg.includes("--custom-arg"))).toBe(true);
     });
   });
+
+  describe("headless: 'shell' (legacy headless mode)", () => {
+    let module: TestingModule;
+    let browserService: BrowserService;
+
+    beforeAll(async () => {
+      @Module({
+        imports: [
+          PuppeteerModule.forRoot({
+            // Use legacy headless mode (chrome-headless-shell)
+            headless: "shell",
+          }),
+        ],
+        providers: [BrowserService],
+      })
+      class TestModule {}
+
+      module = await Test.createTestingModule({
+        imports: [TestModule],
+      }).compile();
+
+      browserService = module.get(BrowserService);
+    });
+
+    afterAll(async () => {
+      await module?.close();
+    });
+
+    it("should launch browser in legacy headless shell mode", () => {
+      expect(browserService.browser).toBeDefined();
+      expect(browserService.browser.connected).toBe(true);
+    });
+
+    it("should use chrome-headless-shell binary", () => {
+      const process = browserService.browser.process();
+      expect(process).toBeDefined();
+      const spawnfile = process?.spawnfile ?? "";
+      expect(spawnfile).toContain("chrome-headless-shell");
+    });
+  });
 });
